@@ -1,5 +1,5 @@
 /*
-* Filename: mytcp.cpp
+* Filename: my_tcp_setup.cpp
 * Author: Zelin Liu
 * Date: 2019/07/28
 * Description:
@@ -7,12 +7,12 @@
 */
 
 
-Mytcp::Mytcp(){
+My_tcp_setup::My_tcp_setup(){
   this->mysock = -1;
   this->is_listening = false;
 }
 
-Mytcp::set_my_sock(char * ip, char* port){
+My_tcp_setup::set_my_sock(char * ip, char* port){
 
   int sockfd;
   struct addrinfo hints, *myinfo, *p;
@@ -58,7 +58,7 @@ Mytcp::set_my_sock(char * ip, char* port){
   this->mysock = sockfd;
 }
 
-int Mytcp::get_sock_by_connect(char * ip, char * port){
+int My_tcp_setup::get_sock_by_connect(char * ip, char * port){
   if(is_listening){ //listen() is called, can't connect
     return -1;
   }
@@ -92,7 +92,7 @@ int Mytcp::get_sock_by_connect(char * ip, char * port){
 
 }
 
-int Mytcp::listen(){
+int My_tcp_setup::listen(){
   if(is_listening){ //already listen() ????
     return 1;
   }
@@ -102,7 +102,8 @@ int Mytcp::listen(){
   }
   return 0;
 }
-int Mytcp::get_sock_by_accept(){
+
+int My_tcp_setup::get_sock_by_accept(){
   if(!is_listening){ // if haven't started listen() yet
     return -1;
   }

@@ -13,7 +13,7 @@
 class My_tcp_channel{
 private:
   int socket;
-  std::time_t last_active_time;
+  std::time_t last_recv_time;
 public:
   My_tcp_channel(int s);
   ~My_tcp_channel();

@@ -1,8 +1,8 @@
 /*
-* Filename: mytcp.cpp
+* Filename: my_tcp_setup.cpp
 * Author: Zelin Liu
 * Date: 2019/07/28
-* Description:
+* Description: This class takes ip and port, and returns some socket for communication, use My_tcp_channel for communication
 * Instruction:
 */
 #ifndef _MYTCP_H_
@@ -10,14 +10,14 @@
 
 
 
-class Mytcp{
+class My_tcp_setup{
 private:
   int mysock;
   bool is_listening;
 
 
 public:
-  Mytcp();
+  My_tcp_setup();
   int set_my_sock(char* ip, char* port);
   int get_sock_by_connect(char * ip, char * port);
   int listen();

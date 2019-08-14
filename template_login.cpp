@@ -5,7 +5,7 @@
 * Description: main file for template login project
 * Instruction: compile with g++
 */
-
+#include "lib/server.h"
 int main(int argc, char** argv){
 
 }

@@ -1,0 +1,27 @@
+{
+Problem:
+Message passing between master and slave can have different architectures.
+Master needs to pass sockets to slaves
+slave needs distribution method
+master should keep count of alive session
+-----------------------------------------------------------------
+Solution#1:
+have one shared queue for every slave (think table service restaurant)
+give each slave a shared variable to report current session count
+
+Pro:
+slaves don't worry about other slaves
+Con:
+slave session count may not be most recent(should be harmless in practice)
+
+Solution#2:
+have one shared queue for all slaves (think buffet restaurant)
+give each slave a shared variable to report its session count
+give each slave a targeted session count
+slaves can take turn grab from queue if they are below targeted session count
+
+Pro:
+less queues allocated
+Con:
+race condition of queue
+}

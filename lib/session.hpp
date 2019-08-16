@@ -1,12 +1,12 @@
 /*
-* Filename: session.h
+* Filename: session.hpp
 * Author: Zelin Liu
 * Date: 2019/08/13
 * Description: TLS_Session definition
 * Instruction:
 */
-#ifndef _SESSION_H_
-#define _SESSION_H_
+#ifndef _SESSION_HPP_
+#define _SESSION_HPP_
 class Session{
 public:
   Session(int sock);

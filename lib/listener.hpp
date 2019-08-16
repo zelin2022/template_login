@@ -1,12 +1,12 @@
 /*
-* Filename: listener.h
+* Filename: listener.hpp
 * Author: Zelin Liu
 * Date: 2019/08/13
 * Description: Listener definition
 * Instruction:
 */
-#ifndef _LISTENER_H
-#define _LISTENER_H
+#ifndef _LISTENER_HPP_
+#define _LISTENER_HPP_
 
 #include <string>
 

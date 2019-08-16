@@ -1,7 +1,11 @@
 #include <iostream>
+#include <string>
 
-#include "../TCP_Talker/foo.h"
 int main(){
-  int a = foo();
-  std::cout<<a<<std::endl;
+  std::string a;
+  while(true){
+    std::cin >> a;
+    std::cout<< "received: "<< a << "\n";
+  }
+
 }

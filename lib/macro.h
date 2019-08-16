@@ -1,5 +1,15 @@
+/*
+* Filename: macro.h
+* Author: Zelin Liu
+* Date: 2019/08/14
+* Description: macros
+* Instruction:
+*/
 #ifndef _MACRO_H_
 #define _MACRO_H_
+
+//  main
+#define MAIN_MAX_CIN_BUFFER 1024
 
 // Commands
 

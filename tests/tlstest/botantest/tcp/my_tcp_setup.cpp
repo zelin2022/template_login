@@ -15,7 +15,6 @@ My_tcp_setup::My_tcp_setup(){
 }
 
 int My_tcp_setup::set_my_sock(const char * ip, const char* port){
-
   int sockfd;
   struct addrinfo hints, *myinfo, *p;
   memset(&hints, 0, sizeof (hints));

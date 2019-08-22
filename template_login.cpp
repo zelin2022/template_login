@@ -21,8 +21,9 @@ int main(int argc, char** argv){
 
   while(true){
     std::cin >> command;
-    server.give_command();
+    server.give_command(command);
     if(server.check_want_exit()){
+      server.exit();
       delete(server);
       break;
     }

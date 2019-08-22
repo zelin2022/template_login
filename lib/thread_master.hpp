@@ -7,14 +7,19 @@
 */
 #ifndef _THREAD_MASTER_HPP_
 #define _THREAD_MASTER_HPP_
+
+#include "channel_master_slave.hpp"
+
 class Thread_master{
 public:
-  Thread_master();
-  virtual void thread_function();
-  int add_queue_to_list(std::shared_ptr<Shared_queue<int>>);
+  Thread_master(int sock);
+  void thread_function();
+  void add_queue_to_list(std::shared_ptr<Channel_master_slave>);
 private:
-  std::vector<Shared_queue<int>*> sock_queue_list;
-  std::vector<int> slave_sock_count;
+  void get_their_sock_then_distribute();
+  int listener_sock;
+  std::vector<std::shared_ptr<Channel_master_slave>> channel_list;
+  std::vector<int> slave_session_count;
 };
 
 #endif

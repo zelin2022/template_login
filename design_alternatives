@@ -1,5 +1,18 @@
 {
 Problem:
+
+-----------------------------------------------------------------
+Solution#1:
+Pro:
+Con:
+
+Solution#2:
+Pro:
+Con:
+}
+
+{
+Problem:
 Message passing between master and slave can have different architectures.
 Master needs to pass sockets to slaves
 slave needs distribution method
@@ -24,4 +37,22 @@ Pro:
 less queues allocated
 Con:
 race condition of queue
+}
+
+{
+Problem:
+Slave threads need to pass its current session count back to master thread, so master thread can better distribute new connections.
+
+-----------------------------------------------------------------
+Solution#1: have a int in modified shared_queue, that is accessible by semaphores
+Pro:
+Con:
+
+Solution#2: have a new separate object shared by all slaves, This is a multiple writer single reader architectures. Should have a reader preference
+Pro:
+Con:
+
+Solution#3: each slave thread also have a return queue;
+Pro:
+Con:
 }

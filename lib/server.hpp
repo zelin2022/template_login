@@ -10,29 +10,38 @@
 
 #include <string>
 #include <thread>
+#include <memory>
+#include <atomic>
+#include "channel_master_slave.hpp"
 
 class Server{
 public:
   Server(std::string hostname, std::string port, int num_thread, int socket_per_thread);
-  int give_command(std::string cmd);
+  void give_command(std::string cmd);
   bool check_want_exit();
   ~Server();
 private:
-  int start();
-  int exit();
+  void start();
+  void exit();
 
-  int create_thread_objs();
-  int create_thread_handles();
+  void create_thread_objs();
+  void create_thread_handles();
 
-  std::vector<std::shared<Thread_slave>> v_slave_thread_object;
+  int create_listener_sock();
+
+
+
+
+
+  std::vector<std::shared_ptr<Thread_slave>> v_slave_thread_object;
   std::unique_ptr<Thread_master> master_thread_object;
 
-  std::vector<std::shared_ptr<Shared_queue<int>>> p_shared_queue_list;
-  std::vector<std::shared_ptr<int>> p_session_count_list;
+  std::vector<std::shared_ptr<Channel_master_slave>> p_channel_master_slave_list;
 
   std::thread thread_master_handle;
   std::vector<std::thread> thread_slave_handle_list;
 
+  int listener_sock;
   bool want_exit;
   std::string hostname;
   std::string port;

@@ -11,13 +11,13 @@
 #include "shared_queue.hpp"
 class Thread_slave{
 public:
-  Thread_slave(Shared_queue<int>* sock_queue, int* session_count, int thread_id);
+  Thread_slave(std::shared_ptr<Shared_queue_mod0<int>> sock_queue);
 
-  virtual void thread_function();
+  void thread_function();
 
 private:
-  int fetch_from_queue();
-  std::shared_ptr<Shared_queue<int>> sock_queue;
-  std::vector<int> my_socks;
+  std::shared_ptr<Shared_queue_mod0<int>> sock_queue;
+  std::vector<std::shared_ptr<Session>> session_list;
+
 };
 #endif

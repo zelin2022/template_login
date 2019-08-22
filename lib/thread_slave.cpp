@@ -7,3 +7,12 @@
 */
 
 #include "thread_slave.hpp"
+/*
+*
+*/
+Thread_slave::Thread_slave(Shared_queue<int>* sock_queue, int* session_count, int thread_id){}
+
+/*
+*
+*/
+void Thread_slave::thread_function(){}

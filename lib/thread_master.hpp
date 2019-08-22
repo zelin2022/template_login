@@ -17,9 +17,10 @@ public:
   void add_queue_to_list(std::shared_ptr<Channel_master_slave>);
 private:
   void get_their_sock_then_distribute();
+  void equal_distribute(std::queue to_be_distributed);
   int listener_sock;
   std::vector<std::shared_ptr<Channel_master_slave>> channel_list;
-  std::vector<int> slave_session_count;
+  std::map<int,int> slave_session_count;
 };
 
 #endif

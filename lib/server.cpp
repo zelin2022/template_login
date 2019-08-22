@@ -85,7 +85,7 @@ void create_thread_objs()
   if(this->listner_sock < 0){
     throw std::runtime_error("listener socket not initialized");
   }
-  this->master_thread_object = std::make_unique<Thread_master>(new Thread_master(this->listner_sock));
+  this->master_thread_object = std::make_unique<Thread_master>(new Thread_master(this->listner_sock, this->num_thread));
 
   // for every slave thread
   for(int i = 0; i < this->num_thread; i++)
@@ -159,6 +159,9 @@ int create_listener_sock(){
   if (p == NULL)  {
     throw std::runtime_error("failed to create sock: end of linked list");
   }
+
+  int flags = fcntl(sockfd, F_GETFL, 0);
+  fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
 
   this->mysock = sockfd;
   return sockfd;

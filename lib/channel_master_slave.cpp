@@ -143,3 +143,27 @@ void Channel_master_slave::set_count(int count, bool blocking){
     return 0;
   }
 }
+
+/*
+*
+*/
+void Channel_master_slave::add_count(int to_add, bool blocking){
+  if(blocking)
+  {
+    std::unique_lock<std::mutex> mlock(mutex_count);
+    this->slave_session_count_ += to_add;
+    mlock.unlock();
+    return 1;
+  }
+  else
+  {
+    std::unique_lock<std::mutex> mlock(mutex_count, std::defer_lock);
+    if (mlock.try_lock())
+    {
+      this->slave_session_count_ += to_add;
+      mlock.unlock();
+      return 1;
+    }
+    return 0;
+  }
+}

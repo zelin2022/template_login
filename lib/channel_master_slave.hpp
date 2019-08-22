@@ -28,6 +28,7 @@ public:
   bool pop(int* output, bool blocking);
   bool get_count(int* output, bool blocking);
   void set_count(int count, bool blocking);
+  void add_count(int to_add, bool blocking);
 
 };
 #endif

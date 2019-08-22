@@ -115,6 +115,7 @@ void equal_distribute(std::queue& to_be_distributed)
       if(channel_list[count_map[i].first].get()->push(to_be_distributed.front(), 0) == 1)
       {
         to_be_distributed.pop_front();
+        slave_session_count[cout_map[i].first]++;
         if(to_be_distributed.empty())
         {
           break;

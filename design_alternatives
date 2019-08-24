@@ -56,3 +56,19 @@ Solution#3: each slave thread also have a return queue;
 Pro:
 Con:
 }
+
+{
+Problem:
+poll() is very primitive as it takes pointer an array of structs;
+We need to be able to modify the length of the array
+we also need to correspond the arrays to sessions
+
+-----------------------------------------------------------------
+Solution#1:
+Pro:
+Con:
+
+Solution#2:
+Pro:
+Con:
+}

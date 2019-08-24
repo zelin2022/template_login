@@ -1,31 +1,19 @@
 #include <iostream>
-#include <string>
-#include <memory>
-#include <vector>
+#include <poll.h>
 #include <cstring>
-#include <queue>
+#include <vector>
 
 
 
-void foo(int * a){
-  int f = 5;
-  std::deque<int> *q = new std::deque<int>();
-  q->push_back(f);
-
-  *a = q->front();
-  delete(q);
-}
 int main(){
 
-  int x = 0;
-  foo(&x);
-  std::cout<<x<<std::endl;
-  // std::cout<<&x<<std::endl;
+  std::vector<int> tt;
 
+  tt.push_back(0);
+  tt.push_back(1);
+  std::swap(tt[0], tt.back());
 
+  tt.pop_back();
 
-
-
-
-
+  std::cout<<tt.size()<<std::endl;
 }

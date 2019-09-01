@@ -15,6 +15,23 @@ Session::Session(int sock)
     throw std::runtime_error("Session created with bad socket value : " + std::to_string(sock));
   }
   this->mysock = sock;
+  this->is_closed = false;
+}
+
+/*
+*
+*/
+void Session::do_session()
+{
+  // if this function is called, then there is data on fd's rx buffer
+}
+
+/*
+*
+*/
+void Session::recv_all_msg()
+{
+
 }
 
 /*
@@ -26,7 +43,7 @@ ssize_t Session::send(char* buffer, ssize_t len)
 
   while(len)
   {
-    ssize_t sent = ::send(this->socket, buffer + len, size, MSG_NOSIGNAL);
+    ssize_t sent = ::send(https://i.redd.it/glzojtm1ruj31.gifthis->socket, buffer + len, size, MSG_NOSIGNAL);
 
     if(sent == -1)
     {
@@ -75,4 +92,12 @@ int Session::close()
   close(this->socket);
   this->socket = -1;
   return 0;
+}
+
+/*
+*
+*/
+bool Session::closed()
+{
+  return this->is_closed;
 }

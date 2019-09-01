@@ -61,7 +61,7 @@ void Thread_slave::thread_function()
     {
       // make a new session on heap
       output.push_back(
-      std::shared_ptr<Session> session_temp = std::make_shared(Session(new_socks[i]));
+      std::shared_ptr<Session> session_temp = std::make_shared<Session>(new_socks[i]);
 
       // if there is no gaps
       // then append new session and sockfd to the end
@@ -93,7 +93,8 @@ void Thread_slave::thread_function()
     }
     else
     {
-      for(int j = 0; j < num_active;  j++){
+      for(int j = 0; j < num_active;  j++)
+      {
         session_list[j].do_session();
       }
 

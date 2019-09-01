@@ -91,10 +91,10 @@ void create_thread_objs()
   for(int i = 0; i < this->num_thread; i++)
   {
     // make a shared queue, and a shared session count
-    std::shared_ptr<Channel_master_slave> channel_master_slave_tmp = std::make_shared<Channel_master_slave>(new Channel_master_slave());
+    std::shared_ptr<Channel_master_slave> channel_master_slave_tmp = std::make_shared<Channel_master_slave>();
 
     // create slave thread object, tell them their respective shared queue, shared atomic int, and a thread id;
-    std::shared_ptr<Thread_slave> slave_tmp = std::make_shared<Thread_slave>(new Thread_slave(channel_master_slave_tmp, i));
+    std::shared_ptr<Thread_slave> slave_tmp = std::make_shared<Thread_slave>(channel_master_slave_tmp, i);
     this->master_thread_object.add_queue_to_list(channel_master_slave_tmp);
 
     // save them to server object

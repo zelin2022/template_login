@@ -26,6 +26,29 @@
 
 #define LISTENER_MAX_LISTEN_BACKLOG 128
 
+// session
+#define SESSION_STANDARD_MSG_LEN 128
+#define SESSION_MSG_INDEX_SIGNUP 0x23
+#define SESSION_MSG_INDEX_SIGNIN 0x24
+
+// database
+
+/*
+CREATE TABLE users (
+     id INT NOT NULL AUTO_INCREMENT,
+     name VARCHAR(30) UNIQUE NOT NULL,
+     hashed_password VARCHAR(30) NOT NULL,
+     user_data VARCHAR(100),
+     PRIMARY KEY (id)
+);
+
+*/
+
+#define DATABASE_CONNECT_ADDR "tcp://127.0.0.1:3306"
+#define DATABASE_CONNECT_USERNAME "root"
+#define DATABASE_CONNECT_PASSWORD "root"
+#define DATABASE_TARGET_DATABASE "tl_test"
+
 
 
 #endif

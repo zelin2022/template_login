@@ -15,10 +15,9 @@ public:
 };
 
 int main(){
-  std::unique_ptr<Foo> xx = std::make_unique<Foo>(1);
-  GLOBAL++;
-  Foo* fff = new Foo(3);
-  GLOBAL++;
-  xx.reset(fff);
-  GLOBAL++;
+  char type = 'a';
+  switch(type){
+    case 0x61:
+    std::cout<<"hello"<<std::endl;
+  }
 }

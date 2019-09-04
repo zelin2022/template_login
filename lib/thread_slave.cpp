@@ -10,7 +10,7 @@
 #include "channel_master_slave.hpp"
 
 /*
-*
+* Constructor
 */
 Thread_slave::Thread_slave(std::shared_ptr<Channel_master_slave> comm, int id)
 {
@@ -21,7 +21,7 @@ Thread_slave::Thread_slave(std::shared_ptr<Channel_master_slave> comm, int id)
 }
 
 /*
-*
+* Destructor;
 */
   ~Thread_slave()
   {
@@ -29,12 +29,13 @@ Thread_slave::Thread_slave(std::shared_ptr<Channel_master_slave> comm, int id)
   }
 
 /*
-*
+* everything a slave does
 */
 void Thread_slave::thread_function()
 {
   while(true)
   {
+    // vector to receive sockets from channel
     std::vector<int> new_socks;
 
     // try getting socket from queue until queue is locked or queue is empty
@@ -56,11 +57,10 @@ void Thread_slave::thread_function()
     }
 
 
-
+    // for every new socket
     for(int i = 0; i < num_new_socks_received; i++)
     {
       // make a new session on heap
-      output.push_back(
       std::shared_ptr<Session> session_temp = std::make_shared<Session>(new_socks[i]);
 
       // if there is no gaps
@@ -68,11 +68,11 @@ void Thread_slave::thread_function()
       if(this->gaps.empty())
       {
         this->session_list.push_back(session_temp);
-        this->init_pollfd(this->pollfd_list[num_session], new_socks[i]);
+        this->init_pollfd(this->pollfd_list[this->num_session], new_socks[i]);
       }
-      else
       // if there are gaps
       // fill the gaps
+      else
       {
           this->session_list[this->gaps.back()] = session_temp;
           this->init_pollfd(this->pollfd_list[this->gaps.back()], new_socks[i]);
@@ -88,7 +88,7 @@ void Thread_slave::thread_function()
     int num_active = polled_sessions.size();
 
     if(num_active == 0)
-    {
+    {num_session
       std::this_thread::yield();
     }
     else
@@ -97,7 +97,6 @@ void Thread_slave::thread_function()
       {
         session_list[j].do_session();
       }
-
 
       // not sure if here
     }
@@ -116,7 +115,7 @@ void Thread_slave::thread_function()
 }
 
 /*
-*
+* used to swap 2 the position of 2 sessions and their pollfd
 */
 void Thread_slave::swap_pollfd_and_session_list(int important, int throwaway)
 {
@@ -125,7 +124,7 @@ void Thread_slave::swap_pollfd_and_session_list(int important, int throwaway)
 }
 
 /*
-*
+* initiate a pollfd
 */
 void init_pollfd(struct pollfd &fd, int sock)
 {
@@ -145,7 +144,7 @@ void Thread_slave::rearrange()
   }
 
   // first, find out all the gaps between 0<= gaps <num_session, these are gaps that need to be filled
-  // then find out all the valid between num_session<= valid < num_gaps + num_sessions
+  // then find out all the valids between num_session<= valid < num_gaps + num_sessions which will fill the gap
 
   std::vector<int> to_be_fill;
   std::vector<int> to_be_swap_in;
@@ -167,6 +166,8 @@ void Thread_slave::rearrange()
     }
   }
 
+  // then we can just swap all of them
+
   for(int k = 0; k < to_be_fill.size(); k++)
   {
     this->swap_pollfd_and_session_list(to_be_swap_in[k], to_be_fill[k]);
@@ -175,7 +176,7 @@ void Thread_slave::rearrange()
 }
 
 /*
-*
+* poll(), returns all the session id in a vector
 */
 std::vector<int> Thread_slave::mypoll()
 {

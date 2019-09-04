@@ -12,12 +12,23 @@
 
 class Thread_master{
 public:
-  Thread_master(int sock);
+  /*
+  * @param num_slaves the total number of slave threads
+  */
+  Thread_master(int num_slaves);
+
+  /*
+  * thread function to be run
+  */
   void thread_function();
-  void add_queue_to_list(std::shared_ptr<Channel_master_slave>);
+
+  /*
+  * @param to_add the shared_ptr of a communication channel to add to list
+  */
+  void add_queue_to_list(std::shared_ptr<Channel_master_slave> to_add);
 private:
   void get_their_sock_then_distribute();
-  void equal_distribute(std::queue to_be_distributed);
+  void distribute_mk0(std::queue to_be_distributed);
   int listener_sock;
   std::vector<std::shared_ptr<Channel_master_slave>> channel_list;
   std::map<int,int> slave_session_count;

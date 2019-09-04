@@ -13,7 +13,13 @@
 #include "channel_master_slave.hpp"
 class Thread_slave{
 public:
+
+  /*
+  * @param comm shared_ptr of communication channel between master and slave
+  * @para id slave therad id
+  */
   Thread_slave(std::shared_ptr<Channel_master_slave> comm, int id);
+
   ~Thread_slave();
 
   void thread_function();

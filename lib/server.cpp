@@ -10,24 +10,23 @@
 
 
 /*
-* @param:hostname the ip address of server
-* @param:port The port of the server
-* @param:num_thread The number of thread to launch
-* @param:socket_per_thread The number of sockets each thread supports
+* Constructor for SERVER
 */
 Server::Server(std::string hostname, std::string port, int num_thread, int socket_per_thread)
 {
   this->hostname = hostname;
   this->port = port;
+
+  // boundary check given values with macros defined in macro.h
   if(num_thread > SERVER_NUM_THREAD_MAX || num_thread < SERVER_NUM_THREAD_MIN){
     throw std::runtime_error("Server created with wrong num_thread value : " + std::to_string(num_thread));
   }
   if(socket_per_thread > SERVER_SOCKET_PER_THREAD_MAX || socket_per_thread < SERVER_SOCKET_PER_THREAD_MIN){
     throw std::runtime_error("Server created with wrong socket_per_thread value : " + std::to_string(socket_per_thread));
   }
-  this->num_thread = num_thread;
-  this->socket_per_thread = socket_per_thread;
 
+  this->num_thread = num_thread;
+  this->socket_per_thread = max_socket_per_thread;
   this->listener_sock = -1;
 
   v_slave_thread_object.reserve(num_thread);
@@ -37,20 +36,23 @@ Server::Server(std::string hostname, std::string port, int num_thread, int socke
 }
 
 /*
-*
+* do something for cetain commands:
+* ____
 */
 void Server::give_command(std::string command)
 {
   if(command.compare(0,5, "start") == 0)
   {
 
-  }else if(){
+  }else if()
+  {
 
   }
 }
 
 /*
-*
+* returns the bool value of a flag
+* whoever owns Server obj can use this to shutdown Server
 */
 bool Server::check_want_exit()
 {
@@ -58,7 +60,7 @@ bool Server::check_want_exit()
 }
 
 /*
-*
+* creates all the related objects and threads
 */
 void Server::start()
 {
@@ -67,7 +69,7 @@ void Server::start()
 }
 
 /*
-*
+* ___
 */
 void Server::exit()
 {
@@ -77,24 +79,23 @@ void Server::exit()
 }
 
 /*
-*
+* create all the supporting objects for threads
 */
 void create_thread_objs()
 {
   // make master thread object
-  if(this->listner_sock < 0){
-    throw std::runtime_error("listener socket not initialized");
-  }
-  this->master_thread_object = std::make_unique<Thread_master>(new Thread_master(this->listner_sock, this->num_thread));
+  this->master_thread_object = std::make_unique<Thread_master>(this->num_thread);
 
   // for every slave thread
   for(int i = 0; i < this->num_thread; i++)
   {
-    // make a shared queue, and a shared session count
+    // make a shared channel
     std::shared_ptr<Channel_master_slave> channel_master_slave_tmp = std::make_shared<Channel_master_slave>();
 
-    // create slave thread object, tell them their respective shared queue, shared atomic int, and a thread id;
+    // create slave thread object, tell them their respective shared channel and a thread id;
     std::shared_ptr<Thread_slave> slave_tmp = std::make_shared<Thread_slave>(channel_master_slave_tmp, i);
+
+    // make sure to also give the channel to master_thread_obj as well
     this->master_thread_object.add_queue_to_list(channel_master_slave_tmp);
 
     // save them to server object
@@ -105,64 +106,17 @@ void create_thread_objs()
 }
 
 /*
-*
+* launch threads here
 */
 void create_thread_handles()
 {
-  thread_master_handle = std::thread();
+  // launch master_thread
+  thread_master_handle = std::thread(&Thread_master::thread_function, master_thread_object.get());
+  
+  // launch slave threads
   for(int i = 0; i < this->num_thread; i++)
   {
-    std::thread tmp(&Thread_slave::thread_function, &v_slave_thread_object[i]);
+    std::thread tmp(&Thread_slave::thread_function, v_slave_thread_object[i].get());
     thread_slave_handle_list.push_back(tmp);
   }
-}
-
-/*
-*
-*/
-int create_listener_sock(){
-  int sockfd;
-  struct addrinfo hints, *myinfo, *p;
-  memset(&hints, 0, sizeof (hints));
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = AI_PASSIVE; // use my IP
-
-  int rv;
-  if ((rv = getaddrinfo(this->hostname.c_str(), this->port.c_str(), &hints, &myinfo)) != 0) {
-    throw std::runtime_error("getaddrinfo()");
-  }
-
-
-  for(p = myinfo; p != NULL; p = p->ai_next) {
-    if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
-      perror("server: socket");
-      continue;
-    }
-
-    int yes = 1;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-      perror("setsockopt");
-      continue;
-    }
-
-    if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-      close(sockfd);
-      perror("server: bind");
-      continue;
-    }
-    break;
-  }
-
-  freeaddrinfo(myinfo); // all done with this structure
-
-  if (p == NULL)  {
-    throw std::runtime_error("failed to create sock: end of linked list");
-  }
-
-  int flags = fcntl(sockfd, F_GETFL, 0);
-  fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
-
-  this->mysock = sockfd;
-  return sockfd;
 }

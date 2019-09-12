@@ -15,9 +15,5 @@ public:
 };
 
 int main(){
-  char type = 'a';
-  switch(type){
-    case 0x61:
-    std::cout<<"hello"<<std::endl;
-  }
+  std::shared_ptr<int> a = nullptr;
 }

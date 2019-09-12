@@ -10,6 +10,7 @@
 #include <cstring>
 
 
+
 class Session{
 public:
   /*
@@ -22,19 +23,17 @@ public:
   */
   void do_session();
 
-  int close();
+  // int close();
   ~Session();
 private:
-  void recv_msg();
-  void process_one_msg();
-  ssize_t send(char* buffer, ssize_t len);
-  ssize_t receive(char* buffer, ssize_t* len);
 
-  std::queue<std::shared__ptr<Message>> complete_msgs;
-  std::shared_ptr<Message> incomplete_msg;
+
+
+  std::unique_ptr<Message_reader> reader;
 
   int mysock;
-  std::time_t last_recv_time;
-  bool is_closed;
+  std::shared_ptr<std::time_t> last_recv_time
+
+
 };
 #endif

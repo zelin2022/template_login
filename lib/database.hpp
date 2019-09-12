@@ -13,24 +13,6 @@
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 
-class Message
-{
-public:
-  Message(int len)
-  {
-    this->max_len = len;
-    this->data = (char*) malloc( sizeof(char)* len );
-    this->cur_len = 0;
-  }
-  ~Message()
-  {
-    free(this->data);
-  }
-  char* data;
-  int max_len;
-  int cur_len
-};
-
 class Database
 {
 public:

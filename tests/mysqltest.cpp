@@ -28,23 +28,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
   headers from cppconn/ and mysql_driver.h + mysql_util.h
   (and mysql_connection.h). This will reduce your build time!
 */
-#include "mysql_connection.h"
+// #include "mysql_connection.h"
 
-#include <cppconn/driver.h>
+// #include <cppconn/driver.h>
 
 
 #include <stdexcept>
 #include <string>
 #include <memory>
 
-#define throw(...)
-#include <cppconn/exception.h>
-#undef throw /* reset */
 
+// #include <cppconn/exception.h>
+//
+//
+//
+//
+// #include <cppconn/resultset.h>
+// #include <cppconn/statement.h>
 
-
-#include <cppconn/resultset.h>
-#include <cppconn/statement.h>
+#include <mysql/jdbc.h>
 
 using namespace std;
 

@@ -16,7 +16,7 @@ public:
   /*
   * @param sock, socket for communication
   */
-  Session(int sock);
+  Session(int sock, std::shared_ptr<DB_core> db);
 
   /*
   * main function to call to process communication
@@ -30,9 +30,11 @@ private:
 
 
   std::unique_ptr<Message_reader> reader;
+  std::unique_ptr<Message_processor> processor;
 
   int mysock;
   std::shared_ptr<std::time_t> last_recv_time
+  std::shared_ptr<DB_core> db_core;
 
 
 };

@@ -22,5 +22,6 @@ private:
   std::shared_ptr<std::time_t> last_recv_time
   std::unique_ptr<Message_header> header;
   std::shared_ptr<Message_body> body;
+  bool expect_to_read_EOT;
 };
 #endif

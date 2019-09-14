@@ -29,9 +29,8 @@ Message_header::~Message_header()
 */
 std::shared_ptr<Message_body> Message_header::create_body_and_reset()
 {
-
-  unsigned short temp  = this->received_message_header_len;
+  unsigned short temp  = Message_processor::binary_2_short(this->header);
   this->received_message_header_len = 0;
 
-  return std::make_shared<Message_body>(temp); 
+  return std::make_shared<Message_body>(temp);
 }

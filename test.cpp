@@ -7,13 +7,13 @@
 
 int GLOBAL = 0;
 
-class Foo{
-public:
-  Foo(int x){this->a=x;}
-  ~Foo(){std::cout<<this->a<<std::endl;}
-  int a;
-};
+
+
+void foo(char * data){
+  std::cout<<data[0]<<std::endl;
+}
 
 int main(){
-  std::shared_ptr<int> a = nullptr;
+  unsigned char a = 255;
+  std::cout<< (size_t) a << std::endl;
 }

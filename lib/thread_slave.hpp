@@ -35,6 +35,8 @@ private:
   int num_session;
   std::vector<int> gaps;
 
+  std::shared_ptr<DB_core> db_core;
+
 
   void swap_pollfd_and_session_list(struct pollfd &important, struct pollfd &throwaway);
   static void init_pollfd(struct pollfd &fd, int sock);

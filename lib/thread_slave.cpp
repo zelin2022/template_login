@@ -33,6 +33,7 @@ Thread_slave::Thread_slave(std::shared_ptr<Channel_master_slave> comm, int id)
 */
 void Thread_slave::thread_function()
 {
+  this->db_core = std::make_shared<DB_core>(DATABASE_TARGET_DATABASE, DATABASE_CONNECT_HOSTNAME, DATABASE_CONNECT_USERNAME, DATABASE_CONNECT_PASSWORD);
   while(true)
   {
     // vector to receive sockets from channel
@@ -61,7 +62,7 @@ void Thread_slave::thread_function()
     for(int i = 0; i < num_new_socks_received; i++)
     {
       // make a new session on heap
-      std::shared_ptr<Session> session_temp = std::make_shared<Session>(new_socks[i]);
+      std::shared_ptr<Session> session_temp = std::make_shared<Session>(new_socks[i], this->db_core);
 
       // if there is no gaps
       // then append new session and sockfd to the end

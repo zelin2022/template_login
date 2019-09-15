@@ -5,15 +5,19 @@
 #include <memory>
 
 
-int GLOBAL = 0;
+class foo
+{
+public:
+  static void boo(){
+    poo();
+  }
+  static void poo(){
+    std::cout<<"a"<<std::endl;
+  }
+};
+
+int main(int argc, char** argv){
+  foo::boo();
 
 
-
-void foo(char * data){
-  std::cout<<data[0]<<std::endl;
-}
-
-int main(){
-  unsigned char a = 255;
-  std::cout<< (size_t) a << std::endl;
 }

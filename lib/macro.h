@@ -29,24 +29,57 @@
 // session
 #define HEX_END_OF_TRANSIMISSION 0x04
 
-// database
 
-/*
-CREATE TABLE users (
-     id INT NOT NULL AUTO_INCREMENT,
-     name VARCHAR(30) UNIQUE NOT NULL,
-     hashed_password VARCHAR(30) NOT NULL,
-     user_data VARCHAR(100),
-     PRIMARY KEY (id)
-);
-
-*/
 
 #define DATABASE_CONNECT_HOSTNAME "tcp://127.0.0.1:3306"
 #define DATABASE_CONNECT_USERNAME "root"
 #define DATABASE_CONNECT_PASSWORD "root"
 #define DATABASE_TARGET_DATABASE "tl_test"
 
+
+// database
+
+/*
+CREATE TABLE user (
+     ID INT NOT NULL AUTO_INCREMENT,
+     USERNAME VARCHAR(30) UNIQUE NOT NULL,
+     PASSWORD VARCHAR(30) NOT NULL,
+     DATA VARCHAR(100),
+     PRIMARY KEY (id)
+);
+
+
+*/
+
+// to understand what's going on here we need to understand message sturcture
+///////////////////////////////////////////
+// header  2 bytes
+  ///////////////////////////////////////////
+  // body
+  // message code 2bytes
+  ///////////////////////////////////////////
+  // Length of username 2 byte
+    ///////////////////////////////////////////
+    // username n bytes
+  // ETX 1 byte
+  ///////////////////////////////////////////
+  // Length of password 2 byte
+    ///////////////////////////////////////////
+    // password n bytes
+  // ETX 1 byte
+///////////////////////////////////////////
+// EOT 1 byte
+///////////////////////////////////////////
+
+
+// TLDR for message
+
+// 2 byte for header
+// --------------------
+// 2 byte for message code
+// each field is 2+len+1 bytes
+// 1 byte for EOT
+// -------------------------
 
 
 #endif

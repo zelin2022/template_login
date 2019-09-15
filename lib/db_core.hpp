@@ -12,8 +12,11 @@ class DB_core
 public:
   DB_core(const char* DB, const char* hostname, const char* username, const char* password);
   ~DB_core();
-  void execute(std::string query);
-  void execute(const char* query);
+  // void execute(std::string query);
+  void exec(std::string SQL);
+  template<class T> std::vector<T> store(std::string SQL, T type_example);
+
+
 private:
   std::unique_ptr<mysqlpp::Connection> conn;
 };

@@ -8,12 +8,14 @@
 
 
 
+
+
 #include "db_core.hpp"
 
 /*
 *
 */
-DB_core(const char* DB, const char* hostname, const char* username, const char* password)
+DB_core::DB_core(const char* DB, const char* hostname, const char* username, const char* password)
 {
   this->conn = std::make_unique<mysqlpp::Connection>(false);
 }
@@ -21,7 +23,7 @@ DB_core(const char* DB, const char* hostname, const char* username, const char* 
 /*
 *
 */
-~DB_core()
+~DB_core::DB_core()
 {
 
 }
@@ -29,16 +31,38 @@ DB_core(const char* DB, const char* hostname, const char* username, const char* 
 /*
 *
 */
-void execute(std::string query)
+void DB_core::exec(std::string SQL)
 {
-
-
+  mysqlpp::Query query = this->conn.query(SQL);
+  if(!query.exec()){
+    throw std::runtime_error("INSERT FAILED");
+  }
 }
 
 /*
 *
 */
-void execute(const char* query)
+  template<class T> std::vector<T> DB_core::store(std::string SQL, T type_example)
 {
+  std::vector<t> output;
+  mysqlpp::Query query = this->conn.query(SQL);
+  mysqlpp::StoreQueryResult res = query.store();
+
+  if(res.num_rows() == 0)
+  {
+    throw std::runtime_error("QUREY STORE RETURNS 0 ROW");
+  }
+
+  mysqlpp::StoreQueryResult::const_iterator iter;
+  for(iter = res.begin(); iter!=res.end; ++iter)
+  {
+    mysqlpp::Row row = *it;
+    for(auto &i : row)
+    {
+      output.push_back(i);
+    }
+
+  }
+
 
 }

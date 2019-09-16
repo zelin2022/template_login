@@ -13,7 +13,6 @@ Message_body::Message_body(int len)
   this->data_len = len;
   this->data = (char*)malloc(this->data_len * sizeof(char));
   this->cur_len = 0;
-  this->received_message_header_len;
 }
 
 

@@ -5,19 +5,19 @@
 #include <memory>
 
 
-class foo
-{
-public:
-  static void boo(){
-    poo();
-  }
-  static void poo(){
-    std::cout<<"a"<<std::endl;
-  }
-};
+// class foo
+// {
+// public:
+//   static void boo(){
+//     poo();
+//   }
+//   static void poo(){
+//     std::cout<<"a"<<std::endl;
+//   }
+// };
 
 int main(int argc, char** argv){
-  foo::boo();
+  int *a = new int(5);
 
 
 }

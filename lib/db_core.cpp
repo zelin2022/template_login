@@ -66,3 +66,11 @@ void DB_core::exec(std::string SQL)
 
 
 }
+
+/*
+*
+*/
+std::string get_last_error()
+{
+  return std::string(this->conn.error());
+}

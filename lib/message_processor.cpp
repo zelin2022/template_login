@@ -72,10 +72,10 @@ void do_sign_up(std::shared_ptr<Message_body> msg)
   try{
     this->db->exec(SQL);
     // send success msg
-    this->send_queue.get().push_back(Message_builder::create_message_sign_up_success());
+    this->send_queue.get().push_back(Message_builder::create_message_sign_up_success(this->db.get_last_error()));
   }catch(std::runtime_error &e){
     // send failed msg
-    this->send_queue.get().push_back(Message_builder::create_message_sign_up_failed());
+    this->send_queue.get().push_back(Message_builder::create_message_sign_up_failed(this->db.get_last_error()));
   }
 
 }
@@ -96,7 +96,7 @@ void do_sign_in(std::shared_ptr<Message_body> msg) // password sign in
 
   }catch(std::runtime_error &e){
     // return failed MSG
-    this->send_queue.get().push_back(Message_builder::create_message_sign_in_failed());
+    this->send_queue.get().push_back(Message_builder::create_message_sign_in_failed(this->db.get_last_error()));
   }
 }
 

@@ -14,7 +14,7 @@ public:
   ~Message_writer();
 private:
   ssize_t write(char* buffer, size_t len);
-  void write_message(std::shared_ptr<Message> message);
+  void write_message(std::shared_ptr<Message_body> message);
   int socket;
 
 };

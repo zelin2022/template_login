@@ -7,6 +7,9 @@
 */
 #ifndef _DB_CORE_HPP_
 #define _DB_CORE_HPP_
+
+#include <mysql++.h>
+
 class DB_core
 {
 public:

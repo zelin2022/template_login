@@ -7,19 +7,28 @@
 */
 #ifndef _MESSAGE_PROCESSOR_HPP_
 #define _MESSAGE_PROCESSOR_HPP_
+
+#include "message_body.hpp"
+#include "db_core.hpp"
+#include "message_builder.hpp"
+#include "macro.h"
+#include <vector>
+#include <memory>
+#include <deque>
+
+
 class Message_processor
 {
 public:
-  Message_processor(std::shared_ptr<DB_core> db, std::shared_ptr<std::deque<std::shared_ptr<Message>>> queue);
+  Message_processor(std::shared_ptr<DB_core> dbcore, std::shared_ptr<std::deque<std::shared_ptr<Message_body>>> queue);
   ~Message_processor();
-  void process_messages(std:;vector<std::shared_ptr<Message_body>> input);
-  static unsigned short binary_2_short(char * data);
-  static void get_username_and_password(char* data, std::string &username, std::string &password);
+  void process_messages(std::vector<std::shared_ptr<Message_body>> input);
+  
 private:
   void process_one_msg(std::shared_ptr<Message_body> msg);
 
-  std::shared_ptr<std::deque<std::shared_ptr<Message>>> send_queue;
-  DB_core db;
+  std::shared_ptr<std::deque<std::shared_ptr<Message_body>>> send_queue;
+  std::shared_ptr<DB_core> db;
   void do_sign_up(std::shared_ptr<Message_body> msg);
   void do_sign_in(std::shared_ptr<Message_body> msg);
 

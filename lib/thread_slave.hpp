@@ -9,6 +9,8 @@
 #define _THREAD_SLAVE_HPP_
 
 #include <poll.h>
+#include "session.hpp"
+#include "db_core.hpp"
 
 #include "channel_master_slave.hpp"
 class Thread_slave{

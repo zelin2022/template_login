@@ -111,12 +111,12 @@ void create_thread_objs()
 void create_thread_handles()
 {
   // launch master_thread
-  thread_master_handle = std::thread(&Thread_master::thread_function, master_thread_object.get());
-  
+  thread_master_handle = std::thread(&Thread_master::thread_function, master_thread_object;
+
   // launch slave threads
   for(int i = 0; i < this->num_thread; i++)
   {
-    std::thread tmp(&Thread_slave::thread_function, v_slave_thread_object[i].get());
+    std::thread tmp(&Thread_slave::thread_function, v_slave_thread_object[i];
     thread_slave_handle_list.push_back(tmp);
   }
 }

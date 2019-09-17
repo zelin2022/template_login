@@ -6,7 +6,7 @@
 * Instruction:
 */
 
-#include "message_read.hpp"
+#include "message_reader.hpp"
 
 /*
 *
@@ -14,9 +14,9 @@
 Message_reader::Message_reader(std::shared_ptr<std::time_t> last_recv_time, int sock)
 {
   this->last_recv_time = last_recv_time;
-  this->socket = sock
+  this->socket = sock;
   header = std::make_unique<Message_header>();
-  body = nullptr
+  body = nullptr;
   this->expect_to_read_EOT = false;
 }
 
@@ -30,9 +30,9 @@ Message_reader::~Message_reader()
 /*
 *
 */
-std::vector<std::shared_ptr<Message>> Message_reader::read_all()
+std::vector<std::shared_ptr<Message_body>> Message_reader::read_all()
 {
-  std::vector<std::shared_ptr<Nessage>> output;
+  std::vector<std::shared_ptr<Message_body>> output;
   // while there is data in rx buffer to read
   while(true)
   {
@@ -42,9 +42,9 @@ std::vector<std::shared_ptr<Message>> Message_reader::read_all()
       {
           char eot_temp;
           this->read(&eot_temp, 1);
-          if(eot_temp != HEX_END_OF_TRANSIMISSION)
+          if(eot_temp != MESSAGE_DIVIDER_EOT)
           {
-            throw std::runtime_error("EOT [" + std::to_string(HEX_END_OF_TRANSIMISSION) + "] expected, but got [" + std::to_string(eot_temp) + "] instead");
+            throw std::runtime_error("EOT [" + std::to_string(MESSAGE_DIVIDER_EOT) + "] expected, but got [" + std::to_string(eot_temp) + "] instead");
           }
           else
           {
@@ -52,31 +52,31 @@ std::vector<std::shared_ptr<Message>> Message_reader::read_all()
           }
       }
       ssize_t returned_len = this->read(
-        this->header.get()->header + this->header.get()->received_message_header_len,
-        MESSAGE_HEADER_LEN - this->header.get()->received_message_header_len
+        this->header->header + this->header->received_message_header_len,
+        MESSAGE_HEADER_LEN - this->header->received_message_header_len
       );
       if(returned_len <= 0 )
       {
         break;
       }
-      this->header.get()->received_message_header_len += returned_len;
-      if(this-> header.get()->received_message_header_len = MESSAGE_HEADER_LEN)
+      this->header->received_message_header_len += returned_len;
+      if(this-> header->received_message_header_len = MESSAGE_HEADER_LEN)
       {
-          this->body = this->header.get()->create_body_and_reset();
+          this->body = this->header->create_body_and_reset();
       }
     }
     else
     {
       ssize_t returned_len = this->read(
-        this->body.get()->data + this->body.get()->cur_len,
-        this->body.get()->data_len - this->body.get()->cur_len;
+        this->body->data + this->body->cur_len,
+        this->body->data_len - this->body->cur_len
       );
       if(returned_len <= 0)
       {
         break;
       }
-      this->body.get()->cur_len += returned_len;
-      if(this->body.get()->filled())
+      this->body->cur_len += returned_len;
+      if(this->body->filled())
       {
         this->expect_to_read_EOT = true;
         output.push_back(std::move(this->body));
@@ -93,9 +93,9 @@ std::vector<std::shared_ptr<Message>> Message_reader::read_all()
 ssize_t Message_reader::read(char* buffer, ssize_t len)
 {
   ssize_t rv = 0;
-  rv = recv(this->socket, buffer, len, 0);
+  rv = ::recv(this->socket, buffer, len, 0);
   if(rv > 0){
-    this->last_recv_time = std::time(nullptr);
+    *this->last_recv_time = std::time(nullptr);
   }
   return rv;
 }

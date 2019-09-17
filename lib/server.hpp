@@ -13,6 +13,8 @@
 #include <memory>
 #include <atomic>
 #include "channel_master_slave.hpp"
+#include "thread_master.hpp"
+#include "thread_slave.hpp"
 
 class Server{
 public:
@@ -35,10 +37,12 @@ public:
   bool check_want_exit();
   ~Server();
 
+  void exit();
+
 private:
 
   void start();
-  void exit();
+
 
   void create_thread_objs();
   void create_thread_handles();

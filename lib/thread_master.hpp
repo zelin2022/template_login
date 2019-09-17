@@ -9,6 +9,8 @@
 #define _THREAD_MASTER_HPP_
 
 #include "channel_master_slave.hpp"
+#include <map>
+
 
 class Thread_master{
 public:
@@ -28,7 +30,7 @@ public:
   void add_queue_to_list(std::shared_ptr<Channel_master_slave> to_add);
 private:
   void get_their_sock_then_distribute();
-  void distribute_mk0(std::queue to_be_distributed);
+  void distribute_mk0(std::queue<int>& to_be_distributed);
   int listener_sock;
   std::vector<std::shared_ptr<Channel_master_slave>> channel_list;
   std::map<int,int> slave_session_count;

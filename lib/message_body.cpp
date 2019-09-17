@@ -6,7 +6,9 @@
 * Instruction:
 */
 
-#include "Message_body.hpp"
+#include "message_body.hpp"
+#include <stdlib.h>
+#include <stdexcept>
 
 Message_body::Message_body(int len)
 {
@@ -17,7 +19,7 @@ Message_body::Message_body(int len)
 
 
 
-~Message_body::Message_body()
+Message_body::~Message_body()
 {
   if(this->data != NULL){
     free(this->data);

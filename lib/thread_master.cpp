@@ -125,7 +125,7 @@ void Thread_master::get_their_sock_then_distribute()
     for(int i = 0; i < this->channel_list.size(); i ++)
     {
       int temp = -1;
-      if(this->channel_list[i].get()->get_count(&temp, 0)) // non_blocking, means if mutex is locked then returns false and temp is not updated
+      if(this->channel_list[i]->get_count(&temp, 0)) // non_blocking, means if mutex is locked then returns false and temp is not updated
       {
         this->total_slave_sessions += temp - this->slave_session_count.at(i);
         this->slave_session_count[i] = temp;
@@ -171,7 +171,7 @@ void distribute_mk0(std::queue<int>& to_be_distributed)
   while(!to_be_distributed.empty()){
     for(int i = 0; i<slave_session_count.size(); i++)
     {
-      if(channel_list[count_map[i].first].get()->push(to_be_distributed.front(), 0) == 1)
+      if(channel_list[count_map[i].first]->push(to_be_distributed.front(), 0) == 1)
       {
         to_be_distributed.pop_front();
         slave_session_count[cout_map[i].first]++;

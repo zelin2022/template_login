@@ -37,8 +37,8 @@ ssize_t write(char* buffer, size_t len)
 */
 void write_message(std::shared_ptr<Message_body> message)
 {
-  int len_buff = message.get().data_len;
-  return this->sendall(message.get().data, &len_buf)? message.get().data_len:-1;
+  int len_buff = message->data_len;
+  return this->sendall(message->data, &len_buf)? message->data_len:-1;
 }
 
 /*

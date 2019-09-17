@@ -9,6 +9,10 @@
 #define _SESSION_HPP_
 #include <cstring>
 
+#include "db_core.hpp"
+#include "message_reader.hpp"
+#include "message_body.hpp"
+#include "message_processor.hpp"
 
 
 class Session{
@@ -31,9 +35,9 @@ private:
 
   std::unique_ptr<Message_reader> reader;
   std::unique_ptr<Message_processor> processor;
-  std::shared_ptr<std::deque<std::shared_ptr<Message>>> to_send;
+  std::shared_ptr<std::deque<std::shared_ptr<Message_body>>> to_send;
   int mysock;
-  std::shared_ptr<std::time_t> last_recv_time
+  std::shared_ptr<std::time_t> last_recv_time;
   std::shared_ptr<DB_core> db_core;
 
 

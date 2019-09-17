@@ -8,6 +8,8 @@
 #ifndef _MACRO_H_
 #define _MACRO_H_
 
+#include "message_code.h"
+
 //  main
 #define MAIN_MAX_CIN_BUFFER 1024
 
@@ -27,7 +29,9 @@
 #define LISTENER_MAX_LISTEN_BACKLOG 128
 
 // session
-#define HEX_END_OF_TRANSIMISSION 0x04
+
+// Message_header
+#define MESSAGE_HEADER_LEN 2
 
 
 

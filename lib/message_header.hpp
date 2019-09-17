@@ -9,6 +9,11 @@
 #ifndef _MESSAGE_HEADER_HPP_
 #define _MESSAGE_HEADER_HPP_
 
+#include "macro.h"
+#include "message_body.hpp"
+#include "message_processor.hpp"
+#include <memory>
+
 class Message_header
 {
 public:
@@ -19,4 +24,4 @@ public:
   std::shared_ptr<Message_body> create_body_and_reset();
 };
 
-#endif;
+#endif

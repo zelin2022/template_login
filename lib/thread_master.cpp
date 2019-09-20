@@ -6,6 +6,7 @@
 * Instruction:
 */
 
+#include "thread_master.hpp"
 /*
 * constructor for Thread_master class
 * uses get addrinfo() to get a valid addr
@@ -14,60 +15,23 @@
 * set it to SO_REUSEADDR
 * bind it to addr
 */
-Thread_master::Thread_master(int num_slaves)
+Thread_master::Thread_master(int num_slaves,
+  std::string hostname,
+  std::string port,
+  std::bool_flag should_i_continue_,
+  std::atmoic_flag thread_wants_to_continue_
+)
 {
-  // socket
-  int sockfd;
-  struct addrinfo hints, *myinfo, *p;
-  memset(&hints, 0, sizeof (hints));
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = AI_PASSIVE;
 
-  int rv;
-  if ((rv = getaddrinfo(this->hostname.c_str(), this->port.c_str(), &hints, &myinfo)) != 0) {
-    throw std::runtime_error("getaddrinfo()");
-  }
-
-
-  for(p = myinfo; p != NULL; p = p->ai_next) {
-    if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
-      perror("server: socket");
-      continue;
-    }
-
-    int flags = fcntl(sockfd, F_GETFL, 0);
-    fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
-
-    int yes = 1;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-      close(sockfd);
-      perror("setsockopt");
-      continue;
-    }
-
-    if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-      close(sockfd);
-      perror("server: bind");
-      continue;
-    }
-    break;
-  }
-
-  freeaddrinfo(myinfo); // all done with this structure
-
-  if (p == NULL)  {
-    throw std::runtime_error("failed to create sock: end of linked list");
-  }
-
-  this->listener_sock = sockfd;
-
+  this->should_i_continue = should_i_continue_;
+  this->thread_wants_to_continue = thread_wants_to_continue_;
   // create a map for slave_id and their current session count
   for(int i = 0; i <num_thread; i ++){
     this->slave_session_count.insert(std::map<int,int>::value_type(i, 0));
   }
 
   this->total_slave_sessions = 0;
+  this->listener = std::make_shared<Listener>(hostname, port);
 }
 
 /*
@@ -77,10 +41,13 @@ Thread_master::Thread_master(int num_slaves)
 void Thread_master::thread_function()
 {
   // try catch block for thread?
-  if (listen(this->mysock, LISTENER_MAX_LISTEN_BACKLOG) == -1) {
-    perror("listen()");
-    throw std::runtime_error("listen()");
+
+  while(this->should_i_continue.test_and_set()){
+    // do whatever
   }
+
+
+  // exit()
 
   this->get_their_sock_then_distribute();
 }

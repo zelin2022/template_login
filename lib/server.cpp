@@ -84,7 +84,7 @@ void Server::exit()
 void create_thread_objs()
 {
   // make master thread object
-  this->master_thread_object = std::make_unique<Thread_master>(this->num_thread);
+  this->master_thread_object = std::make_shared<Thread_master>(this->num_thread);
 
   // for every slave thread
   for(int i = 0; i < this->num_thread; i++)

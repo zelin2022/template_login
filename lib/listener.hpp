@@ -10,21 +10,21 @@
 #define _LISTENER_HPP_
 
 #include <string>
+#include <vector>
 
 class Listener{
 public:
-  Listener(std::string hostname, std::string port);
-  int init();
-  static bool set_sock_nonblocking(int sock, bool non_blocking);
-  int start_listen();
-  int get_connection(struct sockaddr& their_addr, socklen_t& sin_size);
-
+  Listener(std::string h, std::string p);
+  ~Listener();
+  void exit();
+  void connect();
+  int get_listener_sock();
+  std::vector<int> get_accept_socks();
 private:
+
   std::string hostname;
   std::string port;
-  int mysock;
-  bool is_listening;
-
-
+  int listener_sock;
+  bool set_sock_nonblocking(bool non_blocking);
 };
 #endif

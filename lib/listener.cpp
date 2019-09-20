@@ -7,23 +7,32 @@
 * Instruction:
 */
 
-#include "macro.h"
 #include "listener.hpp"
 
 /*
 *
 */
-Listener::Listener(std::string hostname, std::string port)
+Listener::Listener(std::string t_hostname, std::string t_port)
 {
-  this->hostname = hostname;
-  this->port = port;
+  this->hostname = t_hostname;
+  this->port = t_port;
 }
 
 /*
 *
 */
-int Listener::init()
+Listener::~Listener()
 {
+  close(this->listener_sock);
+}
+
+
+/*
+*
+*/
+void Listener::connect()
+{
+  // socket
   int sockfd;
   struct addrinfo hints, *myinfo, *p;
   memset(&hints, 0, sizeof (hints));
@@ -32,92 +41,92 @@ int Listener::init()
   hints.ai_flags = AI_PASSIVE;
 
   int rv;
-  if ((rv = getaddrinfo(hostname.c_str(), port.c_str(), &hints, &myinfo)) != 0)
-  {
-    fprintf(stderr, "getaddrinfo(): %s\n", gai_strerror(rv));
-    return -1;
+  if ((rv = getaddrinfo(this->hostname.c_str(), this->port.c_str(), &hints, &myinfo)) != 0) {
+    throw std::runtime_error("getaddrinfo()");
   }
 
-  for(p = myinfo; p != NULL; p = p->ai_next)
-  {
-    if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
-    {
+
+  for(p = myinfo; p != NULL; p = p->ai_next) {
+    if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
       perror("server: socket");
       continue;
     }
 
+    int flags = fcntl(sockfd, F_GETFL, 0);
+    fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
+
     int yes = 1;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
-    {
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+      close(sockfd);
       perror("setsockopt");
       continue;
     }
 
-    if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1)
-    {
+    if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
       close(sockfd);
       perror("server: bind");
       continue;
     }
-
     break;
   }
 
   freeaddrinfo(myinfo); // all done with this structure
 
-  if (p == NULL)
-  {
-    fprintf(stderr, "my addr: failed\n");
-    return(-1);
+  if (p == NULL)  {
+    throw std::runtime_error("failed to create sock: end of linked list");
   }
 
-  this->mysock = sockfd;
-  return 0;
+  if(!this->set_sock_nonblocking(true))
+  {
+      perror("set_sock_nonblocking()");
+      throw std::runtime_error("set_sock_nonblocking()");
+  }
+
+  if (listen(sockfd, LISTENER_MAX_LISTEN_BACKLOG) == -1) {
+    perror("listen()");
+    throw std::runtime_error("listen()");
+  }
+
+  this->listener_sock = sockfd;
 }
 
 /*
 *
 */
-bool Listener::set_sock_nonblocking(int sock, bool non_blocking)
+int Listener::get_listener_sock()
+{
+  return this->listener_sock;
+}
+
+
+
+/*
+*
+*/
+std::vector<int> Listener::get_accept_socks()
+{
+  std::vector<int> output;
+  while(true)
+  {
+    int their_sock = accept(this->mysock, their_addr, sin_size);
+    if (their_sock < 0)
+    {
+      break;
+    }
+    output.push_back(their_sock);
+  }
+  return output;
+}
+
+
+/*
+*
+*/
+bool Listener::set_sock_nonblocking(bool non_blocking)
 {
   if (sock < 0){return false;}
   int flags = fcntl(fd, F_GETFL, 0);
   if (flags == -1) {return false;}
   flags = non_blocking ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK);
   return (fcntl(fd, F_SETFL, flags) == 0) ? true : false;
-}
-
-/*
-*
-*/
-int start_listen()
-{
-  if(this->is_listening)
-  { //already listen() ????
-    return 1;
-  }
-  if (listen(this->mysock, LISTENER_MAX_LISTEN_BACKLOG) == -1)
-  {
-    perror("listen");
-    return -1;
-  }
-  this->is_listening = true;
-  return 0;
-}
-
-/*
-*
-*/
-int get_connection(struct sockaddr& their_addr, socklen_t& sin_size)
-{
-  if(!this->is_listening)
-  {
-    printf("accept() failed because is_listening is false\n");
-    return -1;
-  }
-  int ret = accept(this->mysock, &their_addr, &sin_size);
-  // if(ret == -1){
-  //   perror("accept");
-  // }
-  return ret;
 }

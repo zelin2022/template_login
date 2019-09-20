@@ -6,7 +6,7 @@
 * Instruction:
 */
 
-#include "Channel_master_slave.hpp"
+#include "channel_master_slave.hpp"
 
 /*
 *
@@ -23,14 +23,14 @@ Channel_master_slave::~Channel_master_slave(){}
 */
 bool Channel_master_slave::push(int &item, bool blocking){
   if(blocking){
-    std::unique_lock<std::mutex> mlock(mutex_);
-    queue_.push_back(item);
+    std::unique_lock<std::mutex> mlock(this->mutex_);
+    this->queue_.push_back(item);
     mlock.unlock();
     return 1;
   }else{
-    std::unique_lock<std::mutex> mlock(mutex_, std::defer_lock);
+    std::unique_lock<std::mutex> mlock(this->mutex_, std::defer_lock);
     if (mlock.try_lock()){
-      queue_push_back(item);
+      this->queue_.push_back(item);
       mlock.unlock();
       return 1;
     }
@@ -44,17 +44,17 @@ bool Channel_master_slave::push(int &item, bool blocking){
 bool Channel_master_slave::push(int &&item, bool blocking){
   if(blocking)
   {
-    std::unique_lock<std::mutex> mlock(mutex_);
-    queue_.push_back(std::move(item));
+    std::unique_lock<std::mutex> mlock(this->mutex_);
+    this->queue_.push_back(std::move(item));
     mlock.unlock();
     return 1;
   }
   else
   {
-    std::unique_lock<std::mutex> mlock(mutex_, std::defer_lock);
+    std::unique_lock<std::mutex> mlock(this->mutex_, std::defer_lock);
     if (mlock.try_lock())
     {
-      queue_.push_back(std::move(item));
+      this->queue_.push_back(std::move(item));
       mlock.unlock();
       return 1;
     }
@@ -65,30 +65,30 @@ bool Channel_master_slave::push(int &&item, bool blocking){
 /*
 *
 */
-int Channel_master_slave::pop(int* output, bool blocking){
+bool Channel_master_slave::pop(int* output, bool blocking){
   if(blocking)
   {
-    std::unique_lock<std::mutex> mlock(mutex_);
-    if(queue_.empty()){
+    std::unique_lock<std::mutex> mlock(this->mutex_);
+    if(this->queue_.empty()){
       mlock.unlock();
       return 0;
     }
-    *output = queue_.front();
-    queue_.pop_front();
+    *output = this->queue_.front();
+    this->queue_.pop_front();
     mlock.unlock();
     return 1;
   }
   else
   {
-    std::unique_lock<std::mutex> mlock(mutex_, std::defer_lock);
+    std::unique_lock<std::mutex> mlock(this->mutex_, std::defer_lock);
     if (mlock.try_lock())
     {
-      if(queue_.empty()){
+      if(this->queue_.empty()){
         mlock.unlock();
         return 0;
       }
-      *output = queue_.front();
-      queue_.pop_front();
+      *output = this->queue_.front();
+      this->queue_.pop_front();
       mlock.unlock();
       return 1;
     }
@@ -99,17 +99,17 @@ int Channel_master_slave::pop(int* output, bool blocking){
 /*
 *
 */
-int Channel_master_slave::get_count(int* output, bool blocking);{
+bool Channel_master_slave::get_count(int* output, bool blocking){
   if(blocking)
   {
-    std::unique_lock<std::mutex> mlock(mutex_count);
+    std::unique_lock<std::mutex> mlock(this->mutex_count);
     *output = this->slave_session_count_;
     mlock.unlock();
     return 1;
   }
   else
   {
-    std::unique_lock<std::mutex> mlock(mutex_count, std::defer_lock);
+    std::unique_lock<std::mutex> mlock(this->mutex_count, std::defer_lock);
     if (mlock.try_lock())
     {
       *output = this->slave_session_count_;
@@ -123,17 +123,17 @@ int Channel_master_slave::get_count(int* output, bool blocking);{
 /*
 *
 */
-void Channel_master_slave::set_count(int count, bool blocking){
+bool Channel_master_slave::set_count(int count, bool blocking){
   if(blocking)
   {
-    std::unique_lock<std::mutex> mlock(mutex_count);
+    std::unique_lock<std::mutex> mlock(this->mutex_count);
     this->slave_session_count_ = count;
     mlock.unlock();
     return 1;
   }
   else
   {
-    std::unique_lock<std::mutex> mlock(mutex_count, std::defer_lock);
+    std::unique_lock<std::mutex> mlock(this->mutex_count, std::defer_lock);
     if (mlock.try_lock())
     {
       this->slave_session_count_ = count;
@@ -147,17 +147,17 @@ void Channel_master_slave::set_count(int count, bool blocking){
 /*
 *
 */
-void Channel_master_slave::add_count(int to_add, bool blocking){
+bool Channel_master_slave::add_count(int to_add, bool blocking){
   if(blocking)
   {
-    std::unique_lock<std::mutex> mlock(mutex_count);
+    std::unique_lock<std::mutex> mlock(this->mutex_count);
     this->slave_session_count_ += to_add;
     mlock.unlock();
     return 1;
   }
   else
   {
-    std::unique_lock<std::mutex> mlock(mutex_count, std::defer_lock);
+    std::unique_lock<std::mutex> mlock(this->mutex_count, std::defer_lock);
     if (mlock.try_lock())
     {
       this->slave_session_count_ += to_add;

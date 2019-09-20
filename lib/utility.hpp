@@ -7,6 +7,10 @@
 */
 #ifndef _UTILITY_HPP_
 #define _UTILITY_HPP_
+#include <string>
+#include <stdexcept>
+#include "message_code.h"
+
 class Utility
 {
 public:

@@ -9,8 +9,9 @@
 #define _SESSION_HPP_
 #include <cstring>
 
-#include "db_core.hpp"
+#include "db_con.hpp"
 #include "message_reader.hpp"
+#include "message_writer.hpp"
 #include "message_body.hpp"
 #include "message_processor.hpp"
 
@@ -20,7 +21,7 @@ public:
   /*
   * @param sock, socket for communication
   */
-  Session(int sock, std::shared_ptr<DB_core> db);
+  Session(int sock, std::shared_ptr<DB_con> db);
 
   /*
   * main function to call to process communication
@@ -34,11 +35,12 @@ private:
 
 
   std::unique_ptr<Message_reader> reader;
+  std::unique_ptr<Message_writer> writer;
   std::unique_ptr<Message_processor> processor;
   std::shared_ptr<std::deque<std::shared_ptr<Message_body>>> to_send;
   int mysock;
   std::shared_ptr<std::time_t> last_recv_time;
-  std::shared_ptr<DB_core> db_core;
+  std::shared_ptr<DB_con> db_con;
 
 
 };

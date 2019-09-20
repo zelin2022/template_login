@@ -11,9 +11,9 @@
 /*
 *
 */
-Message_processor::Message_processor(std::shared_ptr<DB_core> dbcore, std::shared_ptr<std::deque<std::shared_ptr<Message_body>>> queue)
+Message_processor::Message_processor(std::shared_ptr<DB_con> dbcon, std::shared_ptr<std::deque<std::shared_ptr<Message_body>>> queue)
 {
-    this->db = dbcore;
+    this->db = dbcon;
     this->send_queue= send_queue;
 }
 

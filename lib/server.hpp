@@ -49,7 +49,7 @@ private:
 
   // thread objects
   std::vector<std::shared_ptr<Thread_slave>> v_slave_thread_object;
-  std::unique_ptr<Thread_master> master_thread_object;
+  std::shared_ptr<Thread_master> master_thread_object;
 
   // inter-thread communication channel
   std::vector<std::shared_ptr<Channel_master_slave>> p_channel_master_slave_list;

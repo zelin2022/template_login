@@ -42,13 +42,13 @@ public:
   * @param count slave_session_count_ to be set
   * @param blocking, true for blocking, false for non_blocking
   */
-  void set_count(int count, bool blocking);
+  bool set_count(int count, bool blocking);
 
   /*
   * @param to_add a value to be add to slave_session_count_
   * @param blocking, true for blocking, false for non_blocking
   */
-  void add_count(int to_add, bool blocking);
+  bool add_count(int to_add, bool blocking);
 private:
   std::deque<int> queue_;
   std::mutex mutex_;

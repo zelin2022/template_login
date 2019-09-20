@@ -7,6 +7,11 @@
 */
 #ifndef _MESSAGE_BUILDER_HPP_
 #define _MESSAGE_BUILDER_HPP_
+#include <memory>
+#include "macro.h"
+#include "message_body.hpp"
+#define __STDC_WANT_LIB_EXT1__ 1
+#include <cstring>
 class Message_builder
 {
 public:

@@ -22,6 +22,7 @@
 
 // class Thread_slave
 #define SLAVE_SOCKET_PER_THREAD_MAX 256
+#define SLAVE_SOCKET_PER_THREAD_MIN 0
 #define SLAVE_POLL_TIMEOUT 0
 
 

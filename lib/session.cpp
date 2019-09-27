@@ -31,6 +31,14 @@ Session::Session(int sock, std::shared_ptr<DB_con> db)
 /*
 *
 */
+Session::~Session()
+{
+
+}
+
+/*
+*
+*/
 void Session::do_session()
 {
   // // if this function is called, then there is data on fd's rx buffer

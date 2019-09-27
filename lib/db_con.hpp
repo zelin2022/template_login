@@ -17,7 +17,8 @@ public:
   ~DB_con();
   // void execute(std::string query);
   void exec(std::string SQL);
-  template<class T> std::vector<T> store(std::string SQL, T type_example);
+  template<class T>
+  std::vector<T> store(std::string SQL);
   std::string get_last_error();
 
 private:

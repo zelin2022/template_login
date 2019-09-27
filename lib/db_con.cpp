@@ -18,6 +18,7 @@
 DB_con::DB_con(const char* DB, const char* hostname, const char* username, const char* password)
 {
   this->conn = std::make_unique<mysqlpp::Connection>(false);
+  conn->connect(DB, hostname, username, password);
 }
 
 /*
@@ -42,7 +43,8 @@ void DB_con::exec(std::string SQL)
 /*
 *
 */
-  template<class T> std::vector<T> DB_con::store(std::string SQL, T type_example)
+template<class T>
+std::vector<T> DB_con::store(std::string SQL)
 {
   std::vector<T> output;
   mysqlpp::Query query = this->conn->query(SQL);
@@ -64,7 +66,7 @@ void DB_con::exec(std::string SQL)
 
   }
 
-
+  return output;
 }
 
 /*

@@ -76,7 +76,7 @@ void Listener::connect()
     throw std::runtime_error("failed to create sock: end of linked list");
   }
 
-  if(!this->set_sock_nonblocking(true))
+  if(!this->set_sock_nonblocking(this->listener_sock, true))
   {
       perror("set_sock_nonblocking()");
       throw std::runtime_error("set_sock_nonblocking()");
@@ -103,30 +103,30 @@ int Listener::get_listener_sock()
 /*
 *
 */
-std::vector<int> Listener::get_accept_socks()
+void Listener::AcceptNewSocks(std::shared_ptr<std::deque<int>> t_queue)
 {
-  std::vector<int> output;
   while(true)
   {
-    int their_sock = accept(this->mysock, their_addr, sin_size);
+    sockaddr* their_addr;
+    socklen_t* sin_size;
+    int their_sock = accept(this->listener_sock, their_addr, sin_size);
     if (their_sock < 0)
     {
       break;
     }
-    output.push_back(their_sock);
+    t_queue->push_back(their_sock);
   }
-  return output;
 }
 
 
 /*
 *
 */
-bool Listener::set_sock_nonblocking(bool non_blocking)
+bool Listener::set_sock_nonblocking(int t_sock, bool non_blocking)
 {
-  if (sock < 0){return false;}
-  int flags = fcntl(fd, F_GETFL, 0);
+  if (t_sock < 0){return false;}
+  int flags = fcntl(t_sock, F_GETFL, 0);
   if (flags == -1) {return false;}
   flags = non_blocking ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK);
-  return (fcntl(fd, F_SETFL, flags) == 0) ? true : false;
+  return (fcntl(t_sock, F_SETFL, flags) == 0) ? true : false;
 }

@@ -85,7 +85,7 @@ void Message_processor::do_sign_in(std::shared_ptr<Message_body> msg) // passwor
   Utility::get_username_and_password(msg->data+2, username, password);
   std::string SQL("SELECT DATA from user where USERNAME = '"+ username +"' and PASSWORD = '" + password + "'");
   try{
-    this->db->store(SQL, (int)123);
+    this->db->exec(SQL);
     // return success MSG
     this->send_queue->push_back(Message_builder::create_message_sign_in_success(this->db->get_last_error()));
 

@@ -22,10 +22,10 @@ public:
   * @para id slave therad id
   */
   Thread_slave(
-    std::shared_ptr<Channel_master_slave> comm,
-    int id,
-    std::atomic_flag should_i_continue_,
-    std::atomic_flag thread_wants_to_continue_
+    std::shared_ptr<Channel_master_slave> t_comm,
+    int t_id,
+    std::shared_ptr<std::atomic<bool>> t_should_i_continue_,
+    std::shared_ptr<std::atomic<bool>> t_thread_wants_to_continue_
   );
 
   ~Thread_slave();
@@ -36,20 +36,20 @@ private:
 
   int id;
   std::shared_ptr<Channel_master_slave> channel;
-
   std::vector<std::shared_ptr<Session>> session_list;
   struct pollfd* pollfd_list;
-
+  std::vector<int> mypoll();
   int num_session;
   std::vector<int> gaps;
-
   std::shared_ptr<DB_con> db_con;
-  std::atomic_flag should_i_continue;
+  std::shared_ptr<std::atomic<bool>> should_i_continue_;
+  std::shared_ptr<std::atomic<bool>> thread_wants_to_continue_;
 
   void swap_pollfd_and_session_list(int important, int throwaway);
   static void init_pollfd(struct pollfd &fd, int sock);
   void rearrange();
-  std::vector<int> mypoll();
+  void safe_exit();
+
 
 };
 #endif

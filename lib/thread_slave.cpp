@@ -13,15 +13,17 @@
 * Constructor
 */
 Thread_slave::Thread_slave(
-  std::shared_ptr<Channel_master_slave> comm,
-  int id,
-  std::atomic_flag should_i_continue_,
-  std:;atomic_flag thread_wants_to_continue_
+  std::shared_ptr<Channel_master_slave> t_comm,
+  int t_id,
+  std::shared_ptr<std::atomic<bool>> t_should_i_continue_,
+  std::shared_ptr<std::atomic<bool>> t_thread_wants_to_continue_
 )
+:
+id(t_id),
+channel(t_comm),
+should_i_continue_(t_should_i_continue_),
+thread_wants_to_continue_(t_thread_wants_to_continue_)
 {
-  this->should_i_continue = should_i_continue_;
-  this->channel = comm;
-  this->id = id;
   this->num_session = 0;
   this->pollfd_list = (struct pollfd*)calloc(SLAVE_SOCKET_PER_THREAD_MAX, sizeof(struct pollfd));
 }
@@ -40,7 +42,7 @@ Thread_slave::~Thread_slave()
 void Thread_slave::thread_function()
 {
   this->db_con = std::make_shared<DB_con>(DATABASE_TARGET_DATABASE, DATABASE_CONNECT_HOSTNAME, DATABASE_CONNECT_USERNAME, DATABASE_CONNECT_PASSWORD);
-  while(this->should_i_continue.test_and_set())
+  while(this->should_i_continue_->load())
   {
     // vector to receive sockets from channel
     std::vector<int> new_socks;
@@ -142,7 +144,7 @@ void Thread_slave::swap_pollfd_and_session_list(int important, int throwaway)
 /*
 * initiate a pollfd
 */
-void init_pollfd(struct pollfd &fd, int sock)
+void Thread_slave::init_pollfd(struct pollfd &fd, int sock)
 {
   fd.fd = sock;
   fd.events = POLLIN;
@@ -209,4 +211,12 @@ std::vector<int> Thread_slave::mypoll()
     throw std::runtime_error("poll() revents and return miss-match");
   }
   return output;
+}
+
+/*
+*
+*/
+void Thread_slave::safe_exit()
+{
+
 }

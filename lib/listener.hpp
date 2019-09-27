@@ -11,6 +11,18 @@
 
 #include <string>
 #include <vector>
+#include <memory>
+#include <deque>
+#include <unistd.h>
+#include <cstring>
+#include <fcntl.h>
+#include "macro.h"
+
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 class Listener{
 public:
@@ -19,12 +31,12 @@ public:
   void exit();
   void connect();
   int get_listener_sock();
-  std::vector<int> get_accept_socks();
+  void AcceptNewSocks(std::shared_ptr<std::deque<int>> t_queue);
 private:
 
   std::string hostname;
   std::string port;
   int listener_sock;
-  bool set_sock_nonblocking(bool non_blocking);
+  static bool set_sock_nonblocking(int t_sock, bool non_blocking);
 };
 #endif

@@ -7,6 +7,8 @@
 */
 
 #include "thread_master.hpp"
+
+
 /*
 * constructor for Thread_master class
 * uses get addrinfo() to get a valid addr
@@ -15,116 +17,122 @@
 * set it to SO_REUSEADDR
 * bind it to addr
 */
-Thread_master::Thread_master(int num_slaves,
-  std::string hostname,
-  std::string port,
-  std::bool_flag should_i_continue_,
-  std::atmoic_flag thread_wants_to_continue_
-)
+Thread_master::Thread_master(int t_num_slaves,
+  std::string t_hostname,
+  std::string t_port,
+  std::shared_ptr<std::atomic<bool>> t_should_i_continue_,
+  std::shared_ptr<std::atomic<bool>> t_thread_wants_to_continue_
+
+):m_should_i_continue(t_should_i_continue_),
+m_thread_wants_to_continue(t_thread_wants_to_continue_)
 {
 
-  this->should_i_continue = should_i_continue_;
-  this->thread_wants_to_continue = thread_wants_to_continue_;
+
   // create a map for slave_id and their current session count
-  for(int i = 0; i <num_thread; i ++){
-    this->slave_session_count.insert(std::map<int,int>::value_type(i, 0));
+  for(int i = 0; i <t_num_slaves; i ++){
+    this->m_vector_slave_session_count.push_back(std::pair<int,int>(i, 0));
   }
 
-  this->total_slave_sessions = 0;
-  this->listener = std::make_shared<Listener>(hostname, port);
-}
-
-/*
-* starts listening for connection
-* then distribute sessions
-*/
-void Thread_master::thread_function()
-{
-  // try catch block for thread?
-
-  while(this->should_i_continue.test_and_set()){
-    // do whatever
-  }
-
-
-  // exit()
-
-  this->get_their_sock_then_distribute();
+  this->m_listener = std::make_shared<Listener>(t_hostname, t_port);
 }
 
 /*
 * add a channel to list
 */
-void Thread_master::add_queue_to_list(std::shared_ptr<Channel_master_slave> to_add)
+void Thread_master::AddQueueToList(std::shared_ptr<Channel_master_slave> to_add)
 {
-  this->queue_list.push_back(to_add);
+  this->m_channel_list.push_back(to_add);
+}
+
+/*
+* 4 things this thread doesslave_session_count
+
+
+* checks for incoming sockets
+* distribute incoming sockets
+* updates socket count
+* re-sort
+
+void GetSock();
+void Distribute();
+void UpdateCount();
+void Sort();
+
+*/
+void Thread_master::ThreadFunction()
+{
+  // try catch block for thread?
+
+  while(this->m_should_i_continue->load())
+  {
+    this->GetSock();
+    this->Distribute();
+    this->UpdateCount();
+    this->SortSessionCount();
+
+  }
+
+
+  this->exit();
+
 }
 
 /*
 *
 */
-void Thread_master::get_their_sock_then_distribute()
+void Thread_master::GetSock()
 {
+  this->m_listener->AcceptNewSocks(this->m_new_socks);
+}
 
-  // storage for their addr, can be used later;
-  struct sockaddr_storage target_addr;
-  memset(&target_addr, 0, sizeof(sockaddr_storage));
-  socklen_t target_addr_len = sizeof(target_addr);
-  std::queue<int> to_be_distributed;
-
-  while(true)
+/*
+*
+*/
+void Thread_master::Distribute()
+{
+  while(!this->m_new_socks->empty())
   {
-
-    // accept as many sessions as possible
-    // since socket is non_blocking
-    // if accept returns -1 then it means no more connections to accept
-    while(true)
+    for(int i = 0; i<this->m_vector_slave_session_count.size(); ++i)
     {
-      int their_sock = accept(this->mysock, their_addr, sin_size);
-      if (their_sock < 0)
-      {
-        break;
-      }
-      to_be_distributed.push_back(their_sock);
-    }
+      // try pushing, if push failed then move on to the next one.
 
-    // check all channels in an attempt to update sock count
-    for(int i = 0; i < this->channel_list.size(); i ++)
-    {
-      int temp = -1;
-      if(this->channel_list[i]->get_count(&temp, 0)) // non_blocking, means if mutex is locked then returns false and temp is not updated
+      //m_vector_slave_session_count is sorted list of slave_id by their session count
+      if(this->m_channel_list[this->m_vector_slave_session_count[i].first]->push(this->m_new_socks->front(), 0) == 1)
       {
-        this->total_slave_sessions += temp - this->slave_session_count.at(i);
-        this->slave_session_count[i] = temp;
+        this->m_new_socks->pop_front();
+        ++this->m_vector_slave_session_count[i].second; // not sure if needed
+        if(this->m_new_socks->empty())
+        {
+          break;
+        }
       }
     }
-
-    /*
-    some problem here
-    i have to distribute the accepted sockets as evenlly as i can to slaves
-    all i have are a list of slave sessions, and they are estimates not exact, their exact <= estimate
-    best way to distribute:
-    */
-    this->distribute_mk0(to_be_distributed); // current implementation ^
   }
 }
 
 /*
-* @param the queue of sockets to be distributed
-* iteration 0 of distribution algorithm
+*
 */
-void distribute_mk0(std::queue<int>& to_be_distributed)
+void Thread_master::UpdateCount()
 {
-
-  // create a vector of pairs (slave id, slave session count)
-  std::vector<std::pair<int,int>> count_map;
-  // fill them
-  for(int i = 0; i<slave_session_count.size(); i++)
+  // check all channels in an attempt to update sock count
+  for(int i = 0; i < this->m_vector_slave_session_count.size(); i ++)
   {
-    count_map.push_back(std::pair<int, int>(i, slave_session_count[i]));
+    int temp = -1;
+    if(this->m_channel_list[this->m_vector_slave_session_count[i].first]->get_count(&temp, 0)) // non_blocking, means if mutex is locked then returns false and temp is not updated
+    {
+      this->m_vector_slave_session_count[i].second = temp;
+    }
   }
-  // then sort it by count
-  sort(count_map.begin(), count_map.end(), [=](std::pair<int, int>& a, std::pair<int, int>& b)
+
+}
+
+/*
+*
+*/
+void Thread_master::SortSessionCount()
+{
+  std::sort(this->m_vector_slave_session_count.begin(), this->m_vector_slave_session_count.end(), [=](std::pair<int, int>& a, std::pair<int, int>& b)
     {
       if(a.second == b.second){
         return a.first < b.first;
@@ -132,21 +140,13 @@ void distribute_mk0(std::queue<int>& to_be_distributed)
       return a.second < b.second;
     }
   );
+}
 
-  // start distributing, while the to_be_distributed queue is not empty
-  // go through all the sorted(by session count) list and attempt to distribute session
-  while(!to_be_distributed.empty()){
-    for(int i = 0; i<slave_session_count.size(); i++)
-    {
-      if(channel_list[count_map[i].first]->push(to_be_distributed.front(), 0) == 1)
-      {
-        to_be_distributed.pop_front();
-        slave_session_count[cout_map[i].first]++;
-        if(to_be_distributed.empty())
-        {
-          break;
-        }
-      }
-    }
-  }
+/*
+*
+*/
+void Thread_master::exit()
+{
+  this->m_thread_wants_to_continue->store(true); // signal back to main thread that I am ready to be killed
+  // really don't have much else.
 }

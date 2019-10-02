@@ -8,13 +8,17 @@
 #ifndef _SERVER_HPP_
 #define _SERVER_HPP_
 
-#include <string>
+
 #include <thread>
 #include <memory>
 #include <atomic>
-#include "channel_master_slave.hpp"
-#include "thread_master.hpp"
-#include "thread_slave.hpp"
+#include <vector>
+
+class Thread_master;
+class Thread_slave;
+class Channel_master_slave;
+
+
 
 class Server{
 public:

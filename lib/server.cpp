@@ -8,12 +8,19 @@
 
 #include "server.hpp"
 
+#include "channel_master_slave.hpp"
+#include "thread_master.hpp"
+#include "thread_slave.hpp"
+#include <string>
+#include "macro.h"
+
+
 
 /*
 * Constructor for SERVER
 */
 Server::Server(std::string t_hostname, std::string t_port, int t_num_thread, int t_socket_per_thread)
-: m_port(t_port), m_hostname(t_hostname), m_socket_per_thread(t_socket_per_thread), m_num_thread(t_num_thread)
+: m_hostname(t_hostname), m_port(t_port), m_num_thread(t_num_thread), m_socket_per_thread(t_socket_per_thread)
 {
 
   // boundary check given values with macros defined in macro.h
@@ -29,6 +36,8 @@ Server::Server(std::string t_hostname, std::string t_port, int t_num_thread, int
   m_v_slave_thread_object.reserve(t_num_thread);
   m_v_channel_master_slave_list.reserve(t_num_thread);
   m_thread_slave_handle_list.reserve(t_num_thread);
+
+  this->m_want_exit = false;
 }
 
 
@@ -46,9 +55,15 @@ Server::~Server()
 */
 void Server::give_command(std::string t_cmd)
 {
+  #ifdef _DEBUG
+  std::cout<<"Command : "+t_cmd<<std::endl;;
+  #endif
   if(t_cmd.compare(0,5, "start") == 0)
   {
-
+    #ifdef _DEBUG
+    std::cout<<"start"<<std::endl;
+    #endif
+    this->start();
   }
   // else if()
   // {
@@ -71,7 +86,13 @@ bool Server::check_want_exit()
 void Server::start()
 {
   create_thread_objs();
+  #ifdef _DEBUG
+  std::cout<< "create_thread_objs() done\n"
+  #endif
   create_thread_handles();
+  #ifdef _DEBUG
+  std::cout<< "create_thread_handles() done\n"
+  #endif
 }
 
 /*

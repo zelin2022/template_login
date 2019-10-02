@@ -10,23 +10,15 @@
 #define _LISTENER_HPP_
 
 #include <string>
-#include <vector>
 #include <memory>
 #include <deque>
-#include <unistd.h>
-#include <cstring>
-#include <fcntl.h>
-#include "macro.h"
 
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+
+
 
 class Listener{
 public:
-  Listener(std::string h, std::string p);
+  Listener(std::string t_hostname, std::string t_port);
   ~Listener();
   void exit();
   void connect();
@@ -34,9 +26,10 @@ public:
   void AcceptNewSocks(std::shared_ptr<std::deque<int>> t_queue);
 private:
 
-  std::string hostname;
-  std::string port;
-  int listener_sock;
+  std::string m_hostname;
+  std::string m_port;
+  int m_listener_sock;
+  static void print_addr(struct sockaddr_storage addr);
   static bool set_sock_nonblocking(int t_sock, bool non_blocking);
 };
 #endif

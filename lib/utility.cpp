@@ -9,37 +9,35 @@
 /*
 *
 */
-void Utility::get_username_and_password(char* data, std::string &username, std::string &password)
+void Utility::get_username_and_password(char* t_data, std::string &t_username, std::string &t_password)
 {
   unsigned short parsed = 0;
 
-  unsigned short len_username = Utility::binary_2_ushort(data);
+  unsigned short len_username = Utility::binary_2_ushort(t_data);
   parsed += 2;
-  username = std::string(data+parsed, (size_t)len_username);
+  t_username = std::string(t_data+parsed, (size_t)len_username);
   parsed += len_username;
-  unsigned char expected_ETX = data[parsed];
+  unsigned char expected_ETX = t_data[parsed];
   if(expected_ETX != MESSAGE_DIVIDER_ETX)
   {
     throw std::runtime_error("username ETX [" + std::to_string(MESSAGE_DIVIDER_ETX) + "] expected, but got [" + std::to_string(expected_ETX) + "] instead");
   }
   parsed+=1;
-  unsigned char len_password =Utility::binary_2_ushort(data+parsed);
+  unsigned char len_password =Utility::binary_2_ushort(t_data+parsed);
   parsed+=2;
-  password = std::string(data+parsed, (size_t)len_password);
+  t_password = std::string(t_data+parsed, (size_t)len_password);
   parsed+=len_password;
-  expected_ETX = data[parsed];
+  expected_ETX = t_data[parsed];
   if(expected_ETX != MESSAGE_DIVIDER_ETX)
   {
     throw std::runtime_error("password ETX [" + std::to_string(MESSAGE_DIVIDER_ETX) + "] expected, but got [" + std::to_string(expected_ETX) + "] instead");
   }
-
-
 }
 
 /*
 *
 */
-unsigned short Utility::binary_2_ushort(char * data)
+unsigned short Utility::binary_2_ushort(char * t_data)
 {
-  return (unsigned short) ((data[1] << 8) &0xFF00) | (data[0]) ;
+  return (unsigned short) ((t_data[1] << 8) &0xFF00) | (t_data[0]) ;
 }

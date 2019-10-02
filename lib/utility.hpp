@@ -14,7 +14,7 @@
 class Utility
 {
 public:
-  static unsigned short binary_2_ushort(char * data);
-  static void get_username_and_password(char* data, std::string &username, std::string &password);
+  static unsigned short binary_2_ushort(char * t_data);
+  static void get_username_and_password(char* t_data, std::string &t_username, std::string &t_password);
 };
 #endif

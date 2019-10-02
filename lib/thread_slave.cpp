@@ -5,9 +5,13 @@
 * Description: Thread_slave implementations
 * Instruction:
 */
-
+#include <poll.h>
 #include "thread_slave.hpp"
 #include "channel_master_slave.hpp"
+#include "session.hpp"
+#include "db_con.hpp"
+#include "channel_master_slave.hpp"
+#include "macro.h"
 
 /*
 * Constructor
@@ -19,13 +23,13 @@ Thread_slave::Thread_slave(
   std::shared_ptr<std::atomic<bool>> t_thread_wants_to_continue_
 )
 :
-id(t_id),
-channel(t_comm),
-should_i_continue_(t_should_i_continue_),
-thread_wants_to_continue_(t_thread_wants_to_continue_)
+m_id(t_id),
+m_channel(t_comm),
+m_should_i_continue_(t_should_i_continue_),
+m_thread_wants_to_continue_(t_thread_wants_to_continue_)
 {
-  this->num_session = 0;
-  this->pollfd_list = (struct pollfd*)calloc(SLAVE_SOCKET_PER_THREAD_MAX, sizeof(struct pollfd));
+  this->m_num_session = 0;
+  this->m_pollfd_list = (struct pollfd*)calloc(SLAVE_SOCKET_PER_THREAD_MAX, sizeof(struct pollfd));
 }
 
 /*
@@ -33,7 +37,7 @@ thread_wants_to_continue_(t_thread_wants_to_continue_)
 */
 Thread_slave::~Thread_slave()
 {
-  free(pollfd_list);
+  free(this->m_pollfd_list);
 }
 
 /*
@@ -41,8 +45,8 @@ Thread_slave::~Thread_slave()
 */
 void Thread_slave::thread_function()
 {
-  this->db_con = std::make_shared<DB_con>(DATABASE_TARGET_DATABASE, DATABASE_CONNECT_HOSTNAME, DATABASE_CONNECT_USERNAME, DATABASE_CONNECT_PASSWORD);
-  while(this->should_i_continue_->load())
+  this->m_db_con = std::make_shared<DB_con>(DATABASE_TARGET_DATABASE, DATABASE_CONNECT_HOSTNAME, DATABASE_CONNECT_USERNAME, DATABASE_CONNECT_PASSWORD);
+  while(this->m_should_i_continue_->load())
   {
     // vector to receive sockets from channel
     std::vector<int> new_socks;
@@ -51,10 +55,10 @@ void Thread_slave::thread_function()
     // current socks and received sockets should not exceed max allowed sockets
 
     int num_new_socks_received = 0;
-    while(this->num_session + num_new_socks_received < SLAVE_SOCKET_PER_THREAD_MAX)
+    while(this->m_num_session + num_new_socks_received < SLAVE_SOCKET_PER_THREAD_MAX)
     {
       int temp_sock = -1;
-      if(this->channel->pop(&temp_sock, 0))
+      if(this->m_channel->pop(&temp_sock, 0))
       {
         new_socks.push_back(temp_sock);
         num_new_socks_received ++;
@@ -67,27 +71,27 @@ void Thread_slave::thread_function()
 
 
     // for every new socket
-    for(int i = 0; i < num_new_socks_received; i++)
+    for(int i = 0; i < num_new_socks_received; ++i)
     {
       // make a new session on heap
-      std::shared_ptr<Session> session_temp = std::make_shared<Session>(new_socks[i], this->db_con);
+      std::shared_ptr<Session> session_temp = std::make_shared<Session>(new_socks[i], this->m_db_con);
 
       // if there is no gaps
       // then append new session and sockfd to the end
-      if(this->gaps.empty())
+      if(this->m_gaps.empty())
       {
-        this->session_list.push_back(session_temp);
-        this->init_pollfd(this->pollfd_list[this->num_session], new_socks[i]);
+        this->m_session_list.push_back(session_temp);
+        this->init_pollfd(this->m_pollfd_list[this->m_num_session], new_socks[i]);
       }
       // if there are gaps
       // fill the gaps
       else
       {
-          this->session_list[this->gaps.back()] = session_temp;
-          this->init_pollfd(this->pollfd_list[this->gaps.back()], new_socks[i]);
-          this->gaps.pop_back();
+          this->m_session_list[this->m_gaps.back()] = session_temp;
+          this->init_pollfd(this->m_pollfd_list[this->m_gaps.back()], new_socks[i]);
+          this->m_gaps.pop_back();
       }
-      num_session++;
+      this->m_num_session++;
     }
 
     this->rearrange();
@@ -102,9 +106,9 @@ void Thread_slave::thread_function()
     }
     else
     {
-      for(int j = 0; j < num_active;  j++)
+      for(int j = 0; j < num_active;  ++j)
       {
-        session_list[j]->do_session();
+        this->m_session_list[j]->do_session();
       }
 
       // not sure if here
@@ -135,19 +139,19 @@ void Thread_slave::thread_function()
 /*
 * used to swap 2 the position of 2 sessions and their pollfd
 */
-void Thread_slave::swap_pollfd_and_session_list(int important, int throwaway)
+void Thread_slave::swap_pollfd_and_session_list(int t_important, int t_throwaway)
 {
-  this->pollfd_list[throwaway] = this->pollfd_list[important];
-  this->session_list[throwaway] = this->session_list[important];
+  this->m_pollfd_list[t_throwaway] = this->m_pollfd_list[t_important];
+  this->m_session_list[t_throwaway] = this->m_session_list[t_important];
 }
 
 /*
 * initiate a pollfd
 */
-void Thread_slave::init_pollfd(struct pollfd &fd, int sock)
+void Thread_slave::init_pollfd(struct pollfd & t_fd, int t_sock)
 {
-  fd.fd = sock;
-  fd.events = POLLIN;
+  t_fd.fd = t_sock;
+  t_fd.events = POLLIN;
 }
 
 /*
@@ -156,7 +160,7 @@ void Thread_slave::init_pollfd(struct pollfd &fd, int sock)
 void Thread_slave::rearrange()
 {
   // if no gaps, then no need to rearrange
-  if(this->gaps.empty())
+  if(this->m_gaps.empty())
   {
     return;
   }
@@ -166,31 +170,31 @@ void Thread_slave::rearrange()
 
   std::vector<int> to_be_filled;
   std::vector<int> to_be_swap_in;
-  for(int j = this->num_session; j < this->gaps.size() + this->num_session; j++)
+  for(unsigned int j = this->m_num_session; j < this->m_gaps.size() + this->m_num_session; ++j)
   {
     to_be_swap_in.push_back(j);
   }
 
-  for(int i = 0; i < this->gaps.size(); i++)
+  for(unsigned int i = 0; i < this->m_gaps.size(); ++i)
   {
-    if(this->gaps[i] < num_session)
+    if(this->m_gaps[i] < this->m_num_session)
     {
-      to_be_filled.push_back(this->gaps[i]);
+      to_be_filled.push_back(this->m_gaps[i]);
     }
     else
     {
-      std::swap(to_be_swap_in[this->gaps[i]-this->num_session], to_be_swap_in.back());
+      std::swap(to_be_swap_in[this->m_gaps[i]-this->m_num_session], to_be_swap_in.back());
       to_be_swap_in.pop_back();
     }
   }
 
   // then we can just swap all of them
 
-  for(int k = 0; k < to_be_filled.size(); k++)
+  for(unsigned int k = 0; k < to_be_filled.size(); ++k)
   {
     this->swap_pollfd_and_session_list(to_be_swap_in[k], to_be_filled[k]);
   }
-  this->gaps.clear();
+  this->m_gaps.clear();
 }
 
 /*
@@ -199,14 +203,14 @@ void Thread_slave::rearrange()
 std::vector<int> Thread_slave::mypoll()
 {
   std::vector<int> output;
-  int num_active = poll(this->pollfd_list, num_session, SLAVE_POLL_TIMEOUT);
-  for(int i = 0; i < num_session; i ++){
-    if(this->pollfd_list[i].revents && POLLIN)
+  int num_active = poll(this->m_pollfd_list, this->m_num_session, SLAVE_POLL_TIMEOUT);
+  for(int i = 0; i < this->m_num_session; ++i){
+    if(this->m_pollfd_list[i].revents && POLLIN)
     {
       output.push_back(i);
     }
   }
-  if(output.size() != num_active)
+  if((int)output.size() != num_active)
   {
     throw std::runtime_error("poll() revents and return miss-match");
   }

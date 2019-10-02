@@ -8,6 +8,9 @@
 
 #include "thread_master.hpp"
 
+#include "channel_master_slave.hpp"
+#include "listener.hpp"
+#include <algorithm>
 
 /*
 * constructor for Thread_master class
@@ -29,7 +32,7 @@ m_thread_wants_to_continue(t_thread_wants_to_continue_)
 
 
   // create a map for slave_id and their current session count
-  for(int i = 0; i <t_num_slaves; i ++){
+  for(int i = 0; i < t_num_slaves; ++i){
     this->m_vector_slave_session_count.push_back(std::pair<int,int>(i, 0));
   }
 
@@ -92,7 +95,7 @@ void Thread_master::Distribute()
 {
   while(!this->m_new_socks->empty())
   {
-    for(int i = 0; i<this->m_vector_slave_session_count.size(); ++i)
+    for(unsigned int i = 0; i<this->m_vector_slave_session_count.size(); ++i)
     {
       // try pushing, if push failed then move on to the next one.
 
@@ -116,7 +119,7 @@ void Thread_master::Distribute()
 void Thread_master::UpdateCount()
 {
   // check all channels in an attempt to update sock count
-  for(int i = 0; i < this->m_vector_slave_session_count.size(); i ++)
+  for(unsigned int i = 0; i < this->m_vector_slave_session_count.size(); ++i)
   {
     int temp = -1;
     if(this->m_channel_list[this->m_vector_slave_session_count[i].first]->get_count(&temp, 0)) // non_blocking, means if mutex is locked then returns false and temp is not updated

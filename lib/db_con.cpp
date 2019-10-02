@@ -17,8 +17,8 @@
 */
 DB_con::DB_con(const char* DB, const char* hostname, const char* username, const char* password)
 {
-  this->conn = std::make_unique<mysqlpp::Connection>(false);
-  conn->connect(DB, hostname, username, password);
+  this->m_conn = std::make_unique<mysqlpp::Connection>(false);
+  this->m_conn->connect(DB, hostname, username, password);
 }
 
 /*
@@ -34,7 +34,7 @@ DB_con::~DB_con()
 */
 void DB_con::exec(std::string SQL)
 {
-  mysqlpp::Query query = this->conn->query(SQL);
+  mysqlpp::Query query = this->m_conn->query(SQL);
   if(!query.exec()){
     throw std::runtime_error("INSERT FAILED");
   }
@@ -47,7 +47,7 @@ template<class T>
 std::vector<T> DB_con::store(std::string SQL)
 {
   std::vector<T> output;
-  mysqlpp::Query query = this->conn->query(SQL);
+  mysqlpp::Query query = this->m_conn->query(SQL);
   mysqlpp::StoreQueryResult res = query.store();
 
   if(res.num_rows() == 0)
@@ -74,5 +74,5 @@ std::vector<T> DB_con::store(std::string SQL)
 */
 std::string DB_con::get_last_error()
 {
-  return std::string(this->conn->error());
+  return std::string(this->m_conn->error());
 }

@@ -8,12 +8,13 @@
 #ifndef _THREAD_MASTER_HPP_
 #define _THREAD_MASTER_HPP_
 
-#include "channel_master_slave.hpp"
-#include "listener.hpp"
-#include <map>
+class Listener;
+class Channel_master_slave;
+
 #include <memory>
 #include <atomic>
-#include <algorithm>
+#include <vector>
+#include <deque>
 
 
 class Thread_master{

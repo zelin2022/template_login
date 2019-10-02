@@ -10,9 +10,9 @@
 #define _MESSAGE_HEADER_HPP_
 
 #include "macro.h"
-#include "message_body.hpp"
-#include "message_processor.hpp"
 #include <memory>
+
+class Message_body;
 
 class Message_header
 {

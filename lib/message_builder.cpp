@@ -7,6 +7,8 @@
 */
 
 #include "message_builder.hpp"
+#include "message_body.hpp"
+#include <cstring>
 
 Message_builder::Message_builder()
 {
@@ -27,11 +29,11 @@ std::shared_ptr<Message_body> Message_builder::create_message_sign_up_success()
   std::shared_ptr<Message_body> output = std::make_shared<Message_body>(2+1);
 
   unsigned short code = MESSAGE_CODE_SIGN_UP_SUCCESS;
-  memcpy(output->data+created, &code, 2);
+  memcpy(output->m_data+created, &code, 2);
   created += 2;
 
   char EOT = MESSAGE_DIVIDER_EOT;
-  memcpy(output->data+created, &EOT, 1);
+  memcpy(output->m_data+created, &EOT, 1);
 
   return output;
 }
@@ -42,22 +44,22 @@ std::shared_ptr<Message_body> Message_builder::create_message_sign_up_failed(std
   std::shared_ptr<Message_body> output = std::make_shared<Message_body>(2+result.size()+1+1);
 
   unsigned short code = MESSAGE_CODE_SIGN_UP_FAILURE;
-  memcpy(output->data+created, &code, 2);
+  memcpy(output->m_data+created, &code, 2);
   created += 2;
 
   unsigned short tx_len = result.size();
-  memcpy(output->data+created, &tx_len, 2);
+  memcpy(output->m_data+created, &tx_len, 2);
   created += 2;
 
-  memcpy(output->data+created, result.c_str(), result.size());
+  memcpy(output->m_data+created, result.c_str(), result.size());
   created += result.size();
 
   char ETX = MESSAGE_DIVIDER_ETX;
-  memcpy(output->data+created, &ETX, 1);
+  memcpy(output->m_data+created, &ETX, 1);
   created += 1;
 
   char EOT = MESSAGE_DIVIDER_EOT;
-  memcpy(output->data+created, &EOT, 1);
+  memcpy(output->m_data+created, &EOT, 1);
 
   return output;
 }
@@ -68,22 +70,22 @@ std::shared_ptr<Message_body> Message_builder::create_message_sign_in_success(st
   std::shared_ptr<Message_body> output = std::make_shared<Message_body>(2+result.size()+1+1);
 
   unsigned short code = MESSAGE_CODE_SIGN_IN_SUCCESS;
-  memcpy(output->data+created, &code, 2);
+  memcpy(output->m_data+created, &code, 2);
   created += 2;
 
   unsigned short tx_len = result.size();
-  memcpy(output->data+created, &tx_len, 2);
+  memcpy(output->m_data+created, &tx_len, 2);
   created += 2;
 
-  memcpy(output->data+created, result.c_str(), result.size());
+  memcpy(output->m_data+created, result.c_str(), result.size());
   created += result.size();
 
   char ETX = MESSAGE_DIVIDER_ETX;
-  memcpy(output->data+created, &ETX, 1);
+  memcpy(output->m_data+created, &ETX, 1);
   created += 1;
 
   char EOT = MESSAGE_DIVIDER_EOT;
-  memcpy(output->data+created, &EOT, 1);
+  memcpy(output->m_data+created, &EOT, 1);
 
   return output;
 }
@@ -94,22 +96,22 @@ std::shared_ptr<Message_body> Message_builder::create_message_sign_in_failed(std
   std::shared_ptr<Message_body> output = std::make_shared<Message_body>(2+result.size()+1+1);
 
   unsigned short code = MESSAGE_CODE_SIGN_IN_FAILURE;
-  memcpy(output->data+created, &code, 2);
+  memcpy(output->m_data+created, &code, 2);
   created += 2;
 
   unsigned short tx_len = result.size();
-  memcpy(output->data+created, &tx_len, 2);
+  memcpy(output->m_data+created, &tx_len, 2);
   created += 2;
 
-  memcpy(output->data+created, result.c_str(), result.size());
+  memcpy(output->m_data+created, result.c_str(), result.size());
   created += result.size();
 
   char ETX = MESSAGE_DIVIDER_ETX;
-  memcpy(output->data+created, &ETX, 1);
+  memcpy(output->m_data+created, &ETX, 1);
   created += 1;
 
   char EOT = MESSAGE_DIVIDER_EOT;
-  memcpy(output->data+created, &EOT, 1);
+  memcpy(output->m_data+created, &EOT, 1);
 
   return output;
 }

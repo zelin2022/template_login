@@ -22,6 +22,6 @@ public:
   std::string get_last_error();
 
 private:
-  std::unique_ptr<mysqlpp::Connection> conn;
+  std::unique_ptr<mysqlpp::Connection> m_conn;
 };
 #endif

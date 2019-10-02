@@ -7,6 +7,8 @@
 */
 
 #include "message_header.hpp"
+#include "utility.hpp"
+#include "message_body.hpp"
 
 /*
 *

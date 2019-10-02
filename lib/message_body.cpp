@@ -10,36 +10,37 @@
 #include <stdlib.h>
 #include <stdexcept>
 
-Message_body::Message_body(int len)
+Message_body::Message_body(int t_len)
+: m_data_len(t_len)
 {
-  this->data_len = len;
-  this->data = (char*)malloc(this->data_len * sizeof(char));
-  this->cur_len = 0;
+
+  this->m_data = (char*)malloc(this->m_data_len * sizeof(char));
+  this->m_cur_len = 0;
 }
 
 
 
 Message_body::~Message_body()
 {
-  if(this->data != NULL){
-    free(this->data);
+  if(this->m_data != NULL){
+    free(this->m_data);
   }
 }
 
 
 bool Message_body::filled()
 {
-  if(this-> data_len > this->cur_len)
+  if(this-> m_data_len > this->m_cur_len)
   {
     return false;
   }
-  else if (this-> data_len == this-> cur_len)
+  else if (this-> m_data_len == this-> m_cur_len)
   {
     return true;
   }
   else
   {
-    throw std::runtime_error("Message_body: cur_len > data_len");
+    throw std::runtime_error("Message_body: m_cur_len > m_data_len");
   }
   return false;
 }

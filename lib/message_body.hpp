@@ -9,13 +9,13 @@
 #define _MESSAGE_BODY_HPP_
 class Message_body{
 public:
-  Message_body(int len);
+  Message_body(int t_len);
   ~Message_body();
 
   bool filled();
 
-  char* data;
-  unsigned short data_len;
-  unsigned short cur_len;
+  char* m_data;
+  unsigned short m_data_len;
+  unsigned short m_cur_len;
 };
 #endif

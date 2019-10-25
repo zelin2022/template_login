@@ -1,11 +1,11 @@
 CPPFLAGS = g++ -std=c++17
 LIBS = -I /usr/local/include/mysql++/ -I /usr/include/mysql/
 LINKER = -lmysqlpp -lmysqlclient -pthread
-DEBUG = -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic
+DEBUG = -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -D _DEBUG -g
 OBJFILES = template_login.o server.o thread_master.o listener.o channel_master_slave.o thread_slave.o db_con.o session.o utility.o message_body.o message_reader.o message_header.o message_writer.o message_processor.o message_builder.o
 TEST = tests/mysqltest/mysql++test_2.o db_con.o
 
-all: $(OBJFILES)
+final: $(OBJFILES)
 	$(CPPFLAGS) $(OBJFILES) -o login $(LIBS) $(LINKER) $(DEBUG)
 
 clean:

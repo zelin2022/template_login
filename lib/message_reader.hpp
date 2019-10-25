@@ -31,8 +31,9 @@ private:
   ssize_t read(char* buffer, ssize_t len);
   int m_socket;
   std::shared_ptr<std::time_t> m_last_recv_time;
+
+
   std::unique_ptr<Message_header> m_header;
   std::shared_ptr<Message_body> m_body;
-  bool expect_to_read_EOT;
 };
 #endif

@@ -11,7 +11,7 @@
 #include "channel_master_slave.hpp"
 #include "listener.hpp"
 #include <algorithm>
-
+#include <iostream>
 /*
 * constructor for Thread_master class
 * uses get addrinfo() to get a valid addr
@@ -23,11 +23,11 @@
 Thread_master::Thread_master(int t_num_slaves,
   std::string t_hostname,
   std::string t_port,
-  std::shared_ptr<std::atomic<bool>> t_should_i_continue_,
-  std::shared_ptr<std::atomic<bool>> t_thread_wants_to_continue_
+  std::atomic<bool> *t_should_i_continue_,
+  std::atomic<bool> *t_thread_wants_to_continue_
 
-):m_should_i_continue(t_should_i_continue_),
-m_thread_wants_to_continue(t_thread_wants_to_continue_)
+):m_should_i_continue(std::move(t_should_i_continue_)),
+m_thread_wants_to_continue(std::move(t_thread_wants_to_continue_))
 {
 
 
@@ -37,6 +37,15 @@ m_thread_wants_to_continue(t_thread_wants_to_continue_)
   }
 
   this->m_listener = std::make_shared<Listener>(t_hostname, t_port);
+  this->m_new_socks = std::make_shared<std::deque<int>>();
+
+
+}
+
+Thread_master::~Thread_master()
+{
+  delete m_thread_wants_to_continue;
+  delete m_should_i_continue;
 }
 
 /*
@@ -65,12 +74,28 @@ void Sort();
 void Thread_master::ThreadFunction()
 {
   // try catch block for thread?
+  // #ifdef _DEBUG
+  // std::cout<< this->m_thread_wants_to_continue<<std::endl;
+  // std::cout<<"Thread_master, ThreadFunction, start\n" ;
+  // #endif
 
-  while(this->m_should_i_continue->load())
+  while(this->m_thread_wants_to_continue)
   {
+    // #ifdef _DEBUG
+    // std::cout<<"Thread_master, ThreadFunction, whileloop, start\n";
+    // #endif
     this->GetSock();
+    // #ifdef _DEBUG
+    // std::cout<<"Thread_master, ThreadFunction, whileloop, GetSock() complete\n";
+    // #endif
     this->Distribute();
+    // #ifdef _DEBUG
+    // std::cout<<"Thread_master, ThreadFunction, whileloop, Distribute() complete\n";
+    // #endif
     this->UpdateCount();
+    // #ifdef _DEBUG
+    // std::cout<<"Thread_master, ThreadFunction, whileloop, UpdateCount() complete\n";
+    // #endif
     this->SortSessionCount();
 
   }
@@ -93,8 +118,14 @@ void Thread_master::GetSock()
 */
 void Thread_master::Distribute()
 {
+  // #ifdef _DEBUG
+  // std::cout<<"Thread_master, Distribute(), before loop\n";
+  // #endif
   while(!this->m_new_socks->empty())
   {
+    // #ifdef _DEBUG
+    // std::cout<<"Thread_master, Distribute(), loop start\n";
+    // #endif
     for(unsigned int i = 0; i<this->m_vector_slave_session_count.size(); ++i)
     {
       // try pushing, if push failed then move on to the next one.
@@ -111,6 +142,9 @@ void Thread_master::Distribute()
       }
     }
   }
+  // #ifdef _DEBUG
+  // std::cout<<"Thread_master, Distribute(), loop end\n";
+  // #endif
 }
 
 /*

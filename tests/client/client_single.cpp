@@ -2,7 +2,7 @@
 * Filename: cllient_single.cpp
 * Author: Zelin Liu
 * Date: 2019/08/13
-* Description: Server implementations
+* Description:
 * Instruction:
 */
 

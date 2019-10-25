@@ -9,6 +9,7 @@
 #include "message_header.hpp"
 #include "utility.hpp"
 #include "message_body.hpp"
+#include <stdexcept>
 
 /*
 *
@@ -27,10 +28,14 @@ Message_header::~Message_header()
 }
 
 /*
-*
+* make sure you check received_message_header_len first
 */
 std::shared_ptr<Message_body> Message_header::create_body_and_reset()
 {
+  // if(this->received_message_header_len != MESSAGE_HEADER_LEN)
+  // {
+  //   return nullptr;
+  // }
   unsigned short temp  = Utility::binary_2_ushort(this->header);
   this->received_message_header_len = 0;
 

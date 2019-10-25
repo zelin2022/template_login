@@ -19,13 +19,16 @@
 #include "macro.h"
 #include <netdb.h>
 #include <arpa/inet.h>
+#ifdef _DEBUG
+#include <iostream>
+#endif
 /*
 *
 */
 Listener::Listener(std::string t_hostname, std::string t_port)
 :m_hostname(t_hostname), m_port(t_port)
 {
-
+  this->connect();
 }
 
 /*
@@ -97,6 +100,10 @@ void Listener::connect()
     throw std::runtime_error("listen()");
   }
 
+  #ifdef _DEBUG
+  std::cout<<"listening\n";
+  #endif
+
   this->m_listener_sock = sockfd;
 }
 
@@ -122,13 +129,16 @@ void Listener::AcceptNewSocks(std::shared_ptr<std::deque<int>> t_queue)
     socklen_t sin_size = sizeof(their_addr);
 
     int their_sock = accept(this->m_listener_sock, (struct sockaddr *)&their_addr, &sin_size);
-    #ifdef _DEBUG
-    this->print_addr(their_addr);
-    #endif
+
     if (their_sock < 0)
     {
       break;
     }
+
+    #ifdef _DEBUG
+    std::cout<<"received a conncetion\n";
+    this->print_addr(their_addr);
+    #endif
     t_queue->push_back(their_sock);
   }
 }

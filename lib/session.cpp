@@ -49,13 +49,7 @@ Session::~Session()
 void Session::do_session()
 {
   // // if this function is called, then there is data on fd's rx buffer
-  // this->m_recv_all_msg();
-  //
-  // while(!this->m_complete_msgs.empty())
-  // {
-  //   this->m_process_one_msg();
-  //   this->m_complete_msgs.pop();
-  // }
+
 
 
 

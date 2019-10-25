@@ -24,21 +24,36 @@ int main(int argc, char** argv)
 
   Server *server = new Server(argv[1], argv[2], atoi(argv[3]), atoi(argv[4]));
 
-  std::string command;
-
-  while(true)
-  {
-
-    std::cin >> command;
-    server->give_command(command);
-
-    if(server->check_want_exit())
-    {
-      server->exit();
-      break;
-    }
-
-  }
+    server->start();
+    while(!server->check_want_exit()){}
+  // std::string command;
+  // while(true)
+  // {
+  //   #ifdef _DEBUG
+  //   std::cout<<"begining loop in main()\n";
+  //   #endif
+  //
+  //   // std::cin.sync();
+  //   // std::getline(std::cin, command, '\n');
+  //   while(!(std::cin>>command)){
+  //     std::cin.clear();
+  //     std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+  //     std::cout<<"failed\n";
+  //   }
+  //   // std::cout<<"hi\n";
+  //   // std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+  //
+  //
+  //   server->give_command(command);
+  //   command.clear();
+  //
+  //   if(server->check_want_exit())
+  //   {
+  //     server->exit();
+  //     break;
+  //   }
+  //
+  // }
   delete(server);
   return 0;
 }

@@ -12,6 +12,7 @@
 #include "db_con.hpp"
 #include "channel_master_slave.hpp"
 #include "macro.h"
+#include <iostream>
 
 /*
 * Constructor
@@ -19,8 +20,8 @@
 Thread_slave::Thread_slave(
   std::shared_ptr<Channel_master_slave> t_comm,
   int t_id,
-  std::shared_ptr<std::atomic<bool>> t_should_i_continue_,
-  std::shared_ptr<std::atomic<bool>> t_thread_wants_to_continue_
+  std::atomic<bool> *t_should_i_continue_,
+  std::atomic<bool> *t_thread_wants_to_continue_
 )
 :
 m_id(t_id),
@@ -37,6 +38,8 @@ m_thread_wants_to_continue_(t_thread_wants_to_continue_)
 */
 Thread_slave::~Thread_slave()
 {
+  delete this->m_should_i_continue_;
+  delete this->m_thread_wants_to_continue_;
   free(this->m_pollfd_list);
 }
 
@@ -45,8 +48,12 @@ Thread_slave::~Thread_slave()
 */
 void Thread_slave::thread_function()
 {
+  #ifdef _DEBUG
+  std::cout<<"Thread_slave "<<this->m_id<<", ThreadFunction, start\n";
+  #endif
+
   this->m_db_con = std::make_shared<DB_con>(DATABASE_TARGET_DATABASE, DATABASE_CONNECT_HOSTNAME, DATABASE_CONNECT_USERNAME, DATABASE_CONNECT_PASSWORD);
-  while(this->m_should_i_continue_->load())
+  while(*this->m_should_i_continue_)
   {
     // vector to receive sockets from channel
     std::vector<int> new_socks;

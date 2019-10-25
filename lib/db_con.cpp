@@ -36,6 +36,7 @@ void DB_con::exec(std::string SQL)
 {
   mysqlpp::Query query = this->m_conn->query(SQL);
   if(!query.exec()){
+    std::cout<<query.error()<<std::endl;
     throw std::runtime_error("INSERT FAILED");
   }
 }

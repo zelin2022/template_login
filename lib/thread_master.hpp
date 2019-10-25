@@ -26,9 +26,11 @@ public:
     int t_num_slaves,
     std::string t_hostname,
     std::string t_port,
-    std::shared_ptr<std::atomic<bool>> t_hould_i_continue_,
-    std::shared_ptr<std::atomic<bool>> t_thread_wants_to_continue_
+    std::atomic<bool> *t_should_i_continue_,
+    std::atomic<bool> *t_thread_wants_to_continue_
   );
+
+  ~Thread_master();
 
   /*
   * @param to_add the shared_ptr of a communication channel to add to list
@@ -49,8 +51,8 @@ private:
   void SortSessionCount();
   void exit();
 
-  std::shared_ptr<std::atomic<bool>> m_should_i_continue;
-  std::shared_ptr<std::atomic<bool>> m_thread_wants_to_continue;
+  std::atomic<bool> *m_should_i_continue;
+  std::atomic<bool> *m_thread_wants_to_continue;
 
   std::shared_ptr<Listener> m_listener;
   std::vector<std::shared_ptr<Channel_master_slave>> m_channel_list;

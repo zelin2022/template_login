@@ -13,6 +13,7 @@
 #include "thread_slave.hpp"
 #include <string>
 #include "macro.h"
+#include "iostream"
 
 
 
@@ -49,27 +50,31 @@ Server::~Server()
 
 }
 
-/*
-* do something for cetain commands:
-* ____
-*/
-void Server::give_command(std::string t_cmd)
-{
-  #ifdef _DEBUG
-  std::cout<<"Command : "+t_cmd<<std::endl;;
-  #endif
-  if(t_cmd.compare(0,5, "start") == 0)
-  {
-    #ifdef _DEBUG
-    std::cout<<"start"<<std::endl;
-    #endif
-    this->start();
-  }
-  // else if()
-  // {
-
-  // }
-}
+// /*
+// * do something for cetain commands:
+// * ____
+// */
+// void Server::give_command(std::string t_cmd)
+// {
+//   #ifdef _DEBUG
+//   std::cout<<"Command : "+t_cmd<<std::endl;;
+//   #endif
+//   if(t_cmd.compare(0,5, "start") == 0)
+//   {
+//     #ifdef _DEBUG
+//     std::cout<<"start"<<std::endl;
+//     #endif
+//     this->start();
+//   }
+//   else
+//   {
+//     std::cout<<"-Invalid Command-\n";
+//   }
+//   // else if()
+//   // {
+//
+//   // }
+// }
 
 /*
 * returns the bool value of a flag
@@ -85,13 +90,13 @@ bool Server::check_want_exit()
 */
 void Server::start()
 {
-  create_thread_objs();
+  this->create_thread_objs();
   #ifdef _DEBUG
-  std::cout<< "create_thread_objs() done\n"
+  std::cout<< "create_thread_objs() done\n";
   #endif
-  create_thread_handles();
+  this->create_thread_handles();
   #ifdef _DEBUG
-  std::cout<< "create_thread_handles() done\n"
+  std::cout<< "create_thread_handles() done\n";
   #endif
 }
 
@@ -110,10 +115,18 @@ void Server::exit()
 */
 void Server::create_thread_objs()
 {
-  this->m_flag_master_should_i_continue_=std::make_shared<std::atomic<bool>>();
-  this->m_flag_master_should_i_continue_->store(true);
-  this->m_flag_master_thread_wants_to_continue_=std::make_shared<std::atomic<bool>>();
-  this->m_flag_master_thread_wants_to_continue_->store(true);
+
+  #ifdef _DEBUG
+  std::cout<<"create_thread start"<<std::endl;
+  #endif
+
+  // this->m_flag_master_should_i_continue_=std::make_shared<std::atomic<bool>>();
+  // this->m_flag_master_should_i_continue_->store(true);
+  this->m_flag_master_should_i_continue_= new std::atomic<bool>(true);
+  this->m_flag_master_thread_wants_to_continue_ = new std::atomic<bool>(true);
+  // test.store(false);
+  // this->m_flag_master_thread_wants_to_continue_=std::make_shared<std::atomic<bool>>(true);
+
   // make master thread object
   this->m_master_thread_object = std::make_shared<Thread_master>(
     this->m_num_thread,
@@ -129,10 +142,8 @@ void Server::create_thread_objs()
     // make a shared channel
     std::shared_ptr<Channel_master_slave> channel_master_slave_tmp = std::make_shared<Channel_master_slave>();
 
-    std::shared_ptr<std::atomic<bool>> tmp_flag_slave_should_i_continue_=std::make_shared<std::atomic<bool>>();
-    tmp_flag_slave_should_i_continue_->store(true);
-    std::shared_ptr<std::atomic<bool>> tmp_flag_slave_thread_wants_to_continue_=std::make_shared<std::atomic<bool>>();
-    tmp_flag_slave_thread_wants_to_continue_->store(true);
+    std::atomic<bool> *tmp_flag_slave_should_i_continue_=new std::atomic<bool>(true);
+    std::atomic<bool> *tmp_flag_slave_thread_wants_to_continue_=new std::atomic<bool>(true);
     // create slave thread object, tell them their respective shared channel and a thread id;
     std::shared_ptr<Thread_slave> slave_tmp = std::make_shared<Thread_slave>(
       channel_master_slave_tmp,

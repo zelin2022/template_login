@@ -30,8 +30,8 @@ public:
   Thread_slave(
     std::shared_ptr<Channel_master_slave> t_comm,
     int t_id,
-    std::shared_ptr<std::atomic<bool>> t_should_i_continue_,
-    std::shared_ptr<std::atomic<bool>> t_thread_wants_to_continue_
+    std::atomic<bool> *t_should_i_continue_,
+    std::atomic<bool> *t_thread_wants_to_continue_
   );
 
   ~Thread_slave();
@@ -48,8 +48,8 @@ private:
   int m_num_session;
   std::vector<int> m_gaps;
   std::shared_ptr<DB_con> m_db_con;
-  std::shared_ptr<std::atomic<bool>> m_should_i_continue_;
-  std::shared_ptr<std::atomic<bool>> m_thread_wants_to_continue_;
+  std::atomic<bool>* m_should_i_continue_;
+  std::atomic<bool>* m_thread_wants_to_continue_;
 
   std::vector<int> mypoll();
   void swap_pollfd_and_session_list(int t_important, int t_throwaway);

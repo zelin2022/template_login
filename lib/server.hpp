@@ -43,9 +43,11 @@ public:
 
   void exit();
 
+  void start();
+
 private:
 
-  void start();
+
 
 
   void create_thread_objs();
@@ -63,12 +65,12 @@ private:
   std::vector<std::thread> m_thread_slave_handle_list;
 
   // flags for master thread
-  std::shared_ptr<std::atomic<bool>> m_flag_master_should_i_continue_;
-  std::shared_ptr<std::atomic<bool>> m_flag_master_thread_wants_to_continue_;
+  std::atomic<bool>* m_flag_master_should_i_continue_;
+  std::atomic<bool>* m_flag_master_thread_wants_to_continue_;
 
   // flags for slave threads
-  std::vector<std::shared_ptr<std::atomic<bool>>> m_v_flag_slave_should_i_continue_;
-  std::vector<std::shared_ptr<std::atomic<bool>>> m_v_flag_slave_thread_wants_to_continue_;
+  std::vector<std::atomic<bool>*> m_v_flag_slave_should_i_continue_;
+  std::vector<std::atomic<bool>*> m_v_flag_slave_thread_wants_to_continue_;
 
 
   bool m_want_exit;

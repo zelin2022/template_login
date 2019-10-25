@@ -52,14 +52,20 @@ void Message_processor::process_one_msg(std::shared_ptr<Message_body> msg)
   switch(msg_code)
   {
     case MESSAGE_CODE_SIGN_UP_REQUEST:
+    #ifdef _DEBUG
+    std::cout<<"sign up called\n";
+    #endif
     this->do_sign_up(msg);
     break;
     case MESSAGE_CODE_SIGN_IN_REQUEST:
+    #ifdef _DEBUG
+    std::cout<<"sign up called\n";
+    #endif
     this->do_sign_in(msg);
     break;
     default:
-    break;
     throw std::runtime_error("Message code [" + std::to_string(msg_code) + "] does not match any known code");
+    break;
   }
 }
 
@@ -76,9 +82,15 @@ void Message_processor::do_sign_up(std::shared_ptr<Message_body> msg)
   try{
     this->m_db->exec(SQL);
     // send success msg
+    #ifdef _DEBUG
+    std::cout<<"sign up successful\n";
+    #endif
     this->m_send_queue->push_back(Message_builder::create_message_sign_up_success());
   }catch(std::runtime_error &e){
     // send failed msg
+    #ifdef _DEBUG
+    std::cout<<"sign up failed\n";
+    #endif
     this->m_send_queue->push_back(Message_builder::create_message_sign_up_failed(this->m_db->get_last_error()));
   }
 
